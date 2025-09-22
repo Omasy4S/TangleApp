@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Приложение для вязания</title>
+    <style>
+        /* Обновлённая палитра — нежная, гармоничная */
+        :root {
+            --primary: #fcd9b8; /* Персиковый (основной акцент) */
+            --secondary: #fef5ec; /* Кремовый (фон для счётчиков) */
+            --accent: #f8cdda; /* Нежно-розовый (для кнопок) */
+            --dark: #5d4a66; /* Тёмно-фиолетовый для текста */
+            --light: #fef7ff; /* Почти белый фон */
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* ✅ Убирает синий квадрат при нажатии */
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            padding: 16px;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 25% 25%, rgba(252, 217, 184, 0.2) 0%, transparent 50%),
+                              radial-gradient(circle at 75% 75%, rgba(248, 205, 202, 0.2) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 8px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #8a7c94;
+            font-weight: 300;
+        }
+
+        /* Навигация и кнопки */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn,
+        .upload-btn,
+        .calc-btn,
+        .add-counter-btn,
+        .delete-project-btn {
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            font-size: 1rem;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--dark);
+            padding: 10px 16px;
+            min-width: 100px;
+            flex: 1 1 120px;
+            max-width: 200px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* Проекты */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .project-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .project-card {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            width: 100%;
+            height: 100%;
+        }
+
+        .project-card:hover {
+            transform: scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        .project-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .project-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .add-project {
+            background: #FEF7F9; /* Новый цвет фона */
+            color: var(--dark);
+        }
+
+        .add-project .project-icon {
+            color: var(--dark);
+            font-size: 3.2rem;
+        }
+
+        .delete-project-card {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: rgba(224, 122, 95, 0.9);
+            color: white;
+            border: 2px solid white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            z-index: 10;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+
+        .delete-project-card:hover {
+            background: #e07a5f;
+            transform: scale(1.1);
+        }
+
+        /* Модальное окно проекта */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px 20px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            animation: modalIn 0.4s ease-out;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--dark);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .edit-title {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            text-align: left;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            font-family: inherit;
+            line-height: 1.3;
+        }
+
+        .edit-title:focus {
+            outline: none;
+            border-bottom: 2px dashed var(--primary);
+        }
+
+        /* Счётчики */
+        .counters-list {
+            margin: 20px 0;
+        }
+
+        .counter-item {
+            background: var(--secondary);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid var(--primary);
+        }
+
+        .counter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .counter-name {
+            font-weight: 600;
+            font-size: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            color: var(--dark);
+            text-align: left;
+            font-family: inherit;
+            flex: 1;
+            min-width: 0;
+            margin-right: 8px;
+        }
+
+        .counter-name:focus {
+            outline: none;
+            text-decoration: underline;
+        }
+
+        .counter-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-label i {
+            font-size: 1.1rem;
+        }
+
+        .control-value {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .counter-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            color: var(--dark);
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .counter-value:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .counter-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .counter-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* Кнопки с уникальными стилями */
+        .add-counter-btn {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--dark);
+            border: 2px dashed var(--primary);
+            padding: 12px 20px;
+            margin-top: 20px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-counter-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .delete-project-btn {
+            background: #e07a5f;
+            color: white;
+            padding: 10px 16px;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .delete-project-btn:hover {
+            background: #c95b43;
+            transform: translateY(-2px);
+        }
+
+        /* Секция схем */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            background: var(--secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            font-size: 0.9rem;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow);
+        }
+
+        .delete-scheme-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(224, 122, 95, 0.8);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 10;
+            opacity: 0.7;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+
+        .delete-scheme-btn:hover {
+            opacity: 1;
+            background: rgba(224, 122, 95, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .delete-scheme-btn {
+                opacity: 1;
+            }
+        }
+
+        .upload-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .upload-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        /* Калькулятор */
+        #calculator {
+            padding: 0 8px;
+            overflow-y: auto; /* Разрешаем вертикальный скролл, если контент не помещается */
+            max-height: calc(100vh - 120px); /* Ограничиваем высоту, чтобы не перекрывалась навигация */
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .calc-group {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .calc-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--dark);
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .calc-input-group {
+            margin-bottom: 12px;
+        }
+
+        .calc-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .calc-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .calc-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .calc-result {
+            background: var(--secondary);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--primary);
+        }
+
+        .calc-result p {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.2rem;
+        }
+
+        .calc-result i {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .calc-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            margin-top: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .calc-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .calc-step {
+            display: none;
+        }
+
+        #step1 {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+/* Универсальная адаптация под все современные телефоны */
+/* Используем не только ширину, но и безопасные зоны */
+
+/* Основной body: добавляем отступы для безопасных зон */
+body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    /* ... остальные ваши стили для body ... */
+}
+
+/* Адаптация для компактных экранов (до 768px) */
+@media (max-width: 768px) {
+    body {
+        padding: calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 8px);
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+    }
+
+    .nav-btn {
+        min-width: 80px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        flex: 1 1 100px;
+    }
+
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 12px;
+    }
+
+    .project-icon {
+        font-size: 1.8rem;
+    }
+
+    .project-name {
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        padding: 20px 16px;
+        max-width: 95vw;
+        max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);
+    }
+
+    .modal-title {
+        font-size: 1.3rem;
+    }
+
+    .edit-title {
+        font-size: 1.3rem;
+    }
+
+    .counter-value {
+        font-size: 1.2rem;
+        min-width: 45px;
+    }
+
+    .counter-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+
+    .gallery-item {
+        font-size: 0.85rem;
+        padding: 6px;
+    }
+
+    /* Калькулятор: убираем боковые отступы, если они есть */
+    #calculator {
+        padding: 0;
+    }
+
+    .calc-group {
+        padding: 16px 12px;
+    }
+}
+
+/* Для очень маленьких экранов или в ландшафтном режиме */
+@media (max-width: 480px) and (max-height: 480px) {
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 8px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
+    .counter-controls {
+        gap: 8px;
+    }
+
+    .control-group {
+        padding: 6px 8px;
+    }
+}
+
+        @media (min-width: 769px) {
+            .calculator-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (min-width: 1024px) {
+            body { padding: 30px; }
+            .container { max-width: 1200px; }
+            .projects-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; }
+        }
+
+        .section { display: none; }
+        #projects { display: block; }
+
+        /* Стиль для модального окна изображения */
+        #imageModal {
+            display: none;
+            background: rgba(0,0,0,0.9) !important;
+            padding: 0 !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 200;
+        }
+
+        #imageModal .close-modal {
+            color: white;
+            background: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        #imageModal .close-modal:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+    </style>
+</head>
+<body>
+<!-- Остальной HTML-код (тело, скрипты) остается полностью без изменений -->
+<div class="container">
+    <header>
+        <h1>Клубок</h1>
+        <p class="subtitle">Твоё творческое пространство для уюта и вдохновения</p>
+    </header>
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="showSection('projects')">Проекты</button>
+        <button class="nav-btn" onclick="showSection('schemes')">Схемы</button>
+        <button class="nav-btn" onclick="showSection('calculator')">Расчёт</button>
+    </div>
+    <!-- Проекты -->
+    <div id="projects" class="section">
+        <h2>Твои проекты</h2>
+        <div class="projects-grid" id="projectsGrid">
+            <!-- Проекты будут добавляться сюда -->
+        </div>
+    </div>
+    <!-- Схемы -->
+    <div id="schemes" class="section">
+        <h2>Твои схемы</h2>
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Схемы будут рендериться сюда -->
+        </div>
+        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="addImage(this)">
+        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">Загрузить новую схему</button>
+    </div>
+    <!-- ✅ ИЗМЕНЕНО: Расчёт — пошаговый -->
+    <div id="calculator" class="section">
+        <h2>Калькулятор петель и рядов</h2>
+        <!-- Шаг 1: Текущие параметры -->
+        <div id="step1" class="calc-step">
+            <div class="calc-group">
+                <div class="calc-title">Текущие параметры</div>
+                <div class="calc-input-group">
+                    <label class="calc-label">Ширина (см)</label>
+                    <input type="number" class="calc-input" id="currentWidth" placeholder="">
+                </div>
+                <div class="calc-input-group">
+                    <label class="calc-label">Длина (см)</label>
+                    <input type="number" class="calc-input" id="currentLength" placeholder="">
+                </div>
+                <div class="calc-input-group">
+                    <label class="calc-label">Петель</label>
+                    <input type="number" class="calc-input" id="currentStitches" placeholder="">
+                </div>
+                <div class="calc-input-group">
+                    <label class="calc-label">Рядов</label>
+                    <input type="number" class="calc-input" id="currentRows" placeholder="">
+                </div>
+            </div>
+            <button class="calc-btn" onclick="nextStep()">Далее</button>
+        </div>
+        <!-- Шаг 2: Желаемые параметры -->
+        <div id="step2" class="calc-step" style="display: none;">
+            <div class="calc-group">
+                <div class="calc-title">Желаемые параметры</div>
+                <div class="calc-input-group">
+                    <label class="calc-label">Ширина (см)</label>
+                    <input type="number" class="calc-input" id="desiredWidth" placeholder="">
+                </div>
+                <div class="calc-input-group">
+                    <label class="calc-label">Длина (см)</label>
+                    <input type="number" class="calc-input" id="desiredLength" placeholder="">
+                </div>
+            </div>
+            <button class="calc-btn" onclick="calculate()">Рассчитать</button>
+        </div>
+        <!-- Шаг 3: Результат -->
+        <div id="step3" class="calc-step" style="display: none;">
+            <div class="calc-result" id="calcResult">
+                <!-- Результат появится здесь -->
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="calc-btn" style="flex: 1;" onclick="backToStep2()">Изменить</button>
+                <button class="calc-btn" style="flex: 1; background: var(--accent);" onclick="resetCalculator()">Заполнить заново</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Модальное окно проекта -->
+<div class="modal" id="projectModal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-title">
+            <input type="text" class="edit-title" id="projectTitleInput">
+        </div>
+        <div class="counters-list" id="countersList">
+            <!-- Счётчики -->
+        </div>
+        <button class="add-counter-btn" onclick="addCounter()">
+            <span>✨</span> <span>Добавить счётчик</span>
+        </button>
+        <button class="delete-project-btn" onclick="deleteProject()">🗑️ Удалить проект</button>
+    </div>
+</div>
+<!-- Модальное окно для просмотра схемы -->
+<div class="modal" id="imageModal">
+    <div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+        <img id="modalImage" src="" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+        <span class="close-modal" onclick="closeImageModal()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; color: white; z-index: 10;">×</span>
+    </div>
+</div>
+<script>
+    // JavaScript код остается полностью без изменений
+    let projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
+    let currentProjectIndex = -1;
+    let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
+    document.addEventListener('DOMContentLoaded', function() {
+        renderProjects();
+        renderSchemes();
+        showSection('projects'); // Показываем первую вкладку по умолчанию
+    });
+    function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(section => {
+            section.style.display = 'none';
+        });
+        document.getElementById(sectionId).style.display = 'block';
+    }
+    // ✅ ИСПРАВЛЕНО: Крестик ВНЕ карточки
+    function renderProjects() {
+        const grid = document.getElementById('projectsGrid');
+        grid.innerHTML = '';
+        // Кнопка добавления нового проекта
+        const addProjectWrapper = document.createElement('div');
+        addProjectWrapper.className = 'project-wrapper';
+        addProjectWrapper.innerHTML = `
+            <div class="project-card add-project">
+                <div class="project-icon">+</div>
+            </div>
+        `;
+        addProjectWrapper.querySelector('.project-card').onclick = createNewProject;
+        grid.appendChild(addProjectWrapper);
+        // Существующие проекты
+        projects.forEach((project, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'project-wrapper';
+            wrapper.innerHTML = `
+                <div class="project-card">
+                    <div class="project-icon">🧶</div>
+                    <div class="project-name">${escapeHtml(project.name)}</div>
+                </div>
+                <button class="delete-project-card" onclick="deleteProjectCard(${index}, event)">×</button>
+            `;
+            const card = wrapper.querySelector('.project-card');
+            card.onclick = (e) => {
+                if (!e.target.closest('.delete-project-card')) {
+                    openProject(index);
+                }
+            };
+            grid.appendChild(wrapper);
+        });
+    }
+    function createNewProject() {
+        const newProject = { name: 'Новый проект', counters: [] };
+        projects.push(newProject);
+        saveProjects();
+        openProject(projects.length - 1);
+    }
+    function openProject(index) {
+        currentProjectIndex = index;
+        const project = projects[index];
+        document.getElementById('projectTitleInput').value = project.name;
+        renderCounters();
+        document.getElementById('projectModal').style.display = 'flex';
+    }
+    function closeModal() {
+        if (currentProjectIndex !== -1) {
+            const newName = document.getElementById('projectTitleInput').value.trim();
+            if (newName) {
+                projects[currentProjectIndex].name = newName;
+            }
+            // ✅ АВТОУДАЛЕНИЕ: Если нет счётчиков — удаляем проект
+            if (projects[currentProjectIndex].counters.length === 0) {
+                projects.splice(currentProjectIndex, 1);
+            }
+            saveProjects();
+            currentProjectIndex = -1;
+        }
+        document.getElementById('projectModal').style.display = 'none';
+        renderProjects();
+    }
+    function renderCounters() {
+        const list = document.getElementById('countersList');
+        list.innerHTML = '';
+        const project = projects[currentProjectIndex];
+        project.counters.forEach((counter, idx) => {
+            const counterDiv = document.createElement('div');
+            counterDiv.className = 'counter-item';
+            counterDiv.innerHTML = `
+                <div class="counter-header">
+                    <input type="text" class="counter-name" value="${escapeHtml(counter.name)}" onblur="updateCounterName(${idx}, this.value)">
+                    <button class="counter-btn" onclick="removeCounter(${idx})">×</button>
+                </div>
+                <div class="counter-controls">
+                    <div class="control-group">
+                        <div class="control-label">
+                            <i>🧶</i> Петли
+                        </div>
+                        <div class="control-value">
+                            <button class="counter-btn" onclick="decrementStitch(${idx})">−</button>
+                            <div class="counter-value" id="stitch-${idx}" onclick="editStitch(${idx})">${counter.stitches}</div>
+                            <button class="counter-btn" onclick="incrementStitch(${idx})">+</button>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <i>📏</i> Ряды
+                        </div>
+                        <div class="control-value">
+                            <button class="counter-btn" onclick="decrementRow(${idx})">−</button>
+                            <div class="counter-value" id="row-${idx}" onclick="editRow(${idx})">${counter.rows}</div>
+                            <button class="counter-btn" onclick="incrementRow(${idx})">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            list.appendChild(counterDiv);
+        });
+    }
+    function addCounter() {
+        if (currentProjectIndex === -1) return;
+        const newCounter = { name: 'Новый счётчик', stitches: 0, rows: 0 };
+        projects[currentProjectIndex].counters.push(newCounter);
+        saveProjects();
+        renderCounters();
+    }
+    function updateCounterName(index, value) {
+        if (value.trim()) {
+            projects[currentProjectIndex].counters[index].name = value.trim();
+            saveProjects();
+        }
+    }
+    function removeCounter(index) {
+        if (confirm('Удалить этот счётчик?')) {
+            projects[currentProjectIndex].counters.splice(index, 1);
+            // ✅ АВТОУДАЛЕНИЕ: Если это был последний счётчик — удаляем проект
+            if (projects[currentProjectIndex].counters.length === 0) {
+                projects.splice(currentProjectIndex, 1);
+                currentProjectIndex = -1;
+                saveProjects();
+                closeModal();
+                return;
+            }
+            saveProjects();
+            renderCounters();
+        }
+    }
+    function incrementStitch(index) {
+        projects[currentProjectIndex].counters[index].stitches++;
+        document.getElementById(`stitch-${index}`).textContent = projects[currentProjectIndex].counters[index].stitches;
+        saveProjects();
+    }
+    function decrementStitch(index) {
+        if (projects[currentProjectIndex].counters[index].stitches > 0) {
+            projects[currentProjectIndex].counters[index].stitches--;
+            document.getElementById(`stitch-${index}`).textContent = projects[currentProjectIndex].counters[index].stitches;
+            saveProjects();
+        }
+    }
+    function incrementRow(index) {
+        projects[currentProjectIndex].counters[index].rows++;
+        document.getElementById(`row-${index}`).textContent = projects[currentProjectIndex].counters[index].rows;
+        saveProjects();
+    }
+    function decrementRow(index) {
+        if (projects[currentProjectIndex].counters[index].rows > 0) {
+            projects[currentProjectIndex].counters[index].rows--;
+            document.getElementById(`row-${index}`).textContent = projects[currentProjectIndex].counters[index].rows;
+            saveProjects();
+        }
+    }
+function editStitch(index) {
+    showCustomPrompt('Введите новое количество петель:', projects[currentProjectIndex].counters[index].stitches, (value) => {
+        const num = parseInt(value);
+        if (!isNaN(num) && num >= 0) {
+            projects[currentProjectIndex].counters[index].stitches = num;
+            document.getElementById(`stitch-${index}`).textContent = num;
+            saveProjects();
+        } else {
+            alert('Пожалуйста, введите корректное число.');
+        }
+    });
+}
+function editRow(index) {
+    showCustomPrompt('Введите новое количество рядов:', projects[currentProjectIndex].counters[index].rows, (value) => {
+        const num = parseInt(value);
+        if (!isNaN(num) && num >= 0) {
+            projects[currentProjectIndex].counters[index].rows = num;
+            document.getElementById(`row-${index}`).textContent = num;
+            saveProjects();
+        } else {
+            alert('Пожалуйста, введите корректное число.');
+        }
+    });
+}
+    function deleteProject() {
+        if (currentProjectIndex === -1 || currentProjectIndex >= projects.length) return;
+        if (confirm('Ты уверена, что хочешь удалить этот проект? Все данные будут потеряны.')) {
+            const indexToRemove = currentProjectIndex;
+            currentProjectIndex = -1;
+            projects.splice(indexToRemove, 1);
+            saveProjects();
+            closeModal();
+        }
+    }
+    // ✅ ИСПРАВЛЕНО: Удаление проекта по крестику
+    function deleteProjectCard(index, event) {
+        event.stopPropagation();
+        if (confirm('Удалить этот проект?')) {
+            projects.splice(index, 1);
+            saveProjects();
+            renderProjects();
+        }
+    }
+    function saveProjects() {
+        localStorage.setItem('knittingProjects', JSON.stringify(projects));
+    }
+    // Функции для схем
+    function renderSchemes() {
+        const grid = document.getElementById('galleryGrid');
+        grid.innerHTML = '';
+        schemes.forEach((scheme, index) => {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            item.style.cursor = 'pointer';
+            item.style.position = 'relative';
+            item.innerHTML = `
+                <img src="${scheme}" alt="Схема ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
+            `;
+            item.querySelector('img').onclick = () => openImageModal(scheme);
+            grid.appendChild(item);
+        });
+    }
+    function addImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newSchemeUrl = e.target.result;
+                schemes.push(newSchemeUrl);
+                saveSchemes();
+                renderSchemes();
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function openImageModal(imageUrl) {
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('imageModal').style.display = 'flex';
+    }
+    function closeImageModal() {
+        document.getElementById('imageModal').style.display = 'none';
+    }
+    function deleteScheme(index, event) {
+        event.stopPropagation();
+        if (confirm('Удалить эту схему?')) {
+            schemes.splice(index, 1);
+            saveSchemes();
+            renderSchemes();
+        }
+    }
+    function saveSchemes() {
+        localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
+    }
+    // ✅ НОВАЯ ЛОГИКА: Пошаговый калькулятор
+    function nextStep() {
+        const currentWidth = parseFloat(document.getElementById('currentWidth').value);
+        const currentLength = parseFloat(document.getElementById('currentLength').value);
+        const currentStitches = parseFloat(document.getElementById('currentStitches').value);
+        const currentRows = parseFloat(document.getElementById('currentRows').value);
+        if (isNaN(currentWidth) || isNaN(currentLength) || isNaN(currentStitches) || isNaN(currentRows) ||
+            currentWidth <= 0 || currentLength <= 0 || currentStitches <= 0 || currentRows <= 0) {
+            alert('Пожалуйста, заполните все поля текущих параметров корректными числами.');
+            return;
+        }
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    }
+    function calculate() {
+        const currentWidth = parseFloat(document.getElementById('currentWidth').value);
+        const currentLength = parseFloat(document.getElementById('currentLength').value);
+        const currentStitches = parseFloat(document.getElementById('currentStitches').value);
+        const currentRows = parseFloat(document.getElementById('currentRows').value);
+        const desiredWidth = parseFloat(document.getElementById('desiredWidth').value);
+        const desiredLength = parseFloat(document.getElementById('desiredLength').value);
+        if (isNaN(desiredWidth) || isNaN(desiredLength) || desiredWidth <= 0 || desiredLength <= 0) {
+            alert('Пожалуйста, заполните все поля желаемых параметров корректными числами.');
+            return;
+        }
+        const stitchesPerCm = currentStitches / currentWidth;
+        const rowsPerCm = currentRows / currentLength;
+        const requiredStitches = Math.round(stitchesPerCm * desiredWidth);
+        const requiredRows = Math.round(rowsPerCm * desiredLength);
+        const resultDiv = document.getElementById('calcResult');
+        resultDiv.innerHTML = `
+            <p>Требуется: <strong>${requiredStitches} п.</strong> и <strong>${requiredRows} р.</strong></p>
+        `;
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+    }
+    function backToStep2() {
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    }
+function resetCalculator() {
+    document.getElementById('currentWidth').value = '';
+    document.getElementById('currentLength').value = '';
+    document.getElementById('currentStitches').value = '';
+    document.getElementById('currentRows').value = '';
+    document.getElementById('desiredWidth').value = '';
+    document.getElementById('desiredLength').value = '';
+    document.getElementById('calcResult').innerHTML = '';
+    document.getElementById('step3').style.display = 'none';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+}
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+// ✅ Функция для создания кастомного диалога вместо prompt()
+function showCustomPrompt(title, defaultValue, callback) {
+    // Создаем элемент модального окна
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '9999';
+    modal.style.padding = '16px';
+
+    // Содержимое диалога
+    const dialog = document.createElement('div');
+    dialog.style.backgroundColor = 'white';
+    dialog.style.borderRadius = '12px';
+    dialog.style.padding = '20px';
+    dialog.style.width = '90%';
+    dialog.style.maxWidth = '300px';
+    dialog.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+    dialog.style.display = 'flex';
+    dialog.style.flexDirection = 'column';
+    dialog.style.gap = '16px';
+
+    // Заголовок
+    const titleEl = document.createElement('h3');
+    titleEl.textContent = title;
+    titleEl.style.margin = '0 0 12px';
+    titleEl.style.fontWeight = '600';
+    titleEl.style.color = '#5d4a66';
+    dialog.appendChild(titleEl);
+
+    // Поле ввода
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = defaultValue;
+    input.style.width = '100%';
+    input.style.padding = '10px';
+    input.style.border = '2px solid #eee';
+    input.style.borderRadius = '8px';
+    input.style.fontSize = '1rem';
+    input.style.outline = 'none';
+    input.style.transition = 'border-color 0.3s';
+    input.style.minHeight = '40px';
+    input.focus();
+    dialog.appendChild(input);
+
+    // Кнопки
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.gap = '12px';
+    buttonContainer.style.justifyContent = 'flex-end';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Отменить';
+    cancelBtn.style.background = '#fcd9b8';
+    cancelBtn.style.color = '#5d4a66';
+    cancelBtn.style.border = 'none';
+    cancelBtn.style.padding = '8px 16px';
+    cancelBtn.style.borderRadius = '8px';
+    cancelBtn.style.cursor = 'pointer';
+    cancelBtn.style.fontWeight = '600';
+    cancelBtn.onclick = () => {
+        document.body.removeChild(modal);
+    };
+    buttonContainer.appendChild(cancelBtn);
+
+    const okBtn = document.createElement('button');
+    okBtn.textContent = 'ОК';
+    okBtn.style.background = '#5d4a66';
+    okBtn.style.color = 'white';
+    okBtn.style.border = 'none';
+    okBtn.style.padding = '8px 16px';
+    okBtn.style.borderRadius = '8px';
+    okBtn.style.cursor = 'pointer';
+    okBtn.style.fontWeight = '600';
+    okBtn.onclick = () => {
+        const value = input.value;
+        callback(value);
+        document.body.removeChild(modal);
+    };
+    buttonContainer.appendChild(okBtn);
+
+    dialog.appendChild(buttonContainer);
+    modal.appendChild(dialog);
+    document.body.appendChild(modal);
+
+    // Обработка клика вне диалога
+    modal.onclick = () => {
+        document.body.removeChild(modal);
+    };
+
+    // Предотвращаем распространение кликов на кнопки внутри диалога
+    dialog.onclick = (e) => e.stopPropagation();
+}
+</script>
+</body>
+</html>
