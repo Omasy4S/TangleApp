@@ -3,7 +3,10 @@ package com.example.app
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -13,11 +16,15 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.webkit.JavascriptInterface
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,10 +32,24 @@ class MainActivity : AppCompatActivity() {
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private val FILE_CHOOSER_REQUEST_CODE = 1
 
-    // Запрашиваем разрешение только для старых версий Android
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { /* Нет необходимости что-то делать, если разрешение отклонено */ }
+    ) { }
+
+    // BroadcastReceiver для обновления из виджета
+    private val widgetUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.example.app.WIDGET_UPDATE") {
+                val projectsJson = intent.getStringExtra("knittingProjects") ?: return
+                webView.evaluateJavascript(
+                    "localStorage.setItem('knittingProjects', '${projectsJson.replace("'", "\\'")}'); " +
+                            "projects = JSON.parse(localStorage.getItem('knittingProjects') || '[]'); " +
+                            "if (currentProjectIndex !== -1) renderCounters();",
+                    null
+                )
+            }
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +59,6 @@ class MainActivity : AppCompatActivity() {
 
         webView = findViewById(R.id.webview)
 
-        // Настройка WebView
         with(webView.settings) {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -47,19 +67,33 @@ class MainActivity : AppCompatActivity() {
             loadWithOverviewMode = true
         }
 
-        // Настройка WebChromeClient для обработки файлов и диалогов
-        webView.webChromeClient = object : WebChromeClient() {
+        // Загружаем данные из SharedPreferences при старте
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                val prefs = getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
+                val projectsJson = prefs.getString("knittingProjects", null)
+                if (projectsJson != null) {
+                    webView.evaluateJavascript(
+                        "localStorage.setItem('knittingProjects', '${projectsJson.replace("'", "\\'")}'); " +
+                                "projects = JSON.parse(localStorage.getItem('knittingProjects') || '[]');",
+                        null
+                    )
+                }
+            }
+        }
 
+        webView.addJavascriptInterface(WebAppInterface(this), "Android")
+
+        webView.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
                 webView: WebView?,
                 filePathCallback: ValueCallback<Array<Uri>>?,
                 fileChooserParams: FileChooserParams?
             ): Boolean {
-                // Отменяем предыдущий запрос, если он есть
                 this@MainActivity.filePathCallback?.onReceiveValue(null)
                 this@MainActivity.filePathCallback = filePathCallback
 
-                // Для Android < 13 запрашиваем разрешение на чтение хранилища
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     val permission = Manifest.permission.READ_EXTERNAL_STORAGE
                     if (ContextCompat.checkSelfPermission(this@MainActivity, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -68,7 +102,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                // Создаем и запускаем Intent для выбора изображения
                 return try {
                     val intent = fileChooserParams?.createIntent()?.apply { type = "image/*" }
                     if (intent != null) {
@@ -86,7 +119,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // Кастомные диалоги для JavaScript
             override fun onJsConfirm(view: WebView?, url: String?, message: String?, result: JsResult?): Boolean {
                 AlertDialog.Builder(this@MainActivity)
                     .setTitle("Подтверждение")
@@ -109,16 +141,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Загружаем локальный HTML-файл
         webView.loadUrl("file:///android_asset/kiniti.html")
 
-        // Обработка кнопки "Назад"
         onBackPressedDispatcher.addCallback(this) {
             if (webView.canGoBack()) {
                 webView.goBack()
             } else {
                 finish()
             }
+        }
+
+        // Регистрируем BroadcastReceiver (как вы просили)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(widgetUpdateReceiver, IntentFilter("com.example.app.WIDGET_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(widgetUpdateReceiver, IntentFilter("com.example.app.WIDGET_UPDATE"))
         }
     }
 
@@ -127,6 +164,27 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
             filePathCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data))
             filePathCallback = null
+        }
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(widgetUpdateReceiver)
+        super.onDestroy()
+    }
+
+    // Интерфейс для синхронизации с виджетом
+    class WebAppInterface(private val context: Context) {
+        @JavascriptInterface
+        fun saveProjects(projectsJson: String) {
+            val prefs = context.getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
+            prefs.edit()
+                .putString("knittingProjects", projectsJson)
+                .apply()
+
+            // Обновляем все виджеты
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val ids = appWidgetManager.getAppWidgetIds(ComponentName(context, KnittingCounterWidget::class.java))
+            KnittingCounterWidget.updateAppWidget(context, appWidgetManager, *ids)
         }
     }
 }

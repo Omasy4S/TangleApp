@@ -478,7 +478,7 @@
         }
 
         .upload-btn {
-            background: var(--primary);
+            background: #ffbb8a;
             color: white;
             padding: 12px;
             border-radius: 10px;
@@ -577,7 +577,7 @@
         }
 
         .calc-btn {
-            background: var(--primary);
+            background: #ffbb8a;
             color: white;
             padding: 12px;
             border-radius: 10px;
@@ -668,7 +668,8 @@ body {
         min-width: 45px;
     }
 
-    .counter-btn {
+    .counter-header .counter-btn {
+        background: #e07a5f;
         width: 30px;
         height: 30px;
         font-size: 0.9rem;
@@ -836,7 +837,7 @@ body {
             </div>
             <div style="display: flex; gap: 12px; margin-top: 16px;">
                 <button class="calc-btn" style="flex: 1;" onclick="backToStep2()">Изменить</button>
-                <button class="calc-btn" style="flex: 1; background: var(--accent);" onclick="resetCalculator()">Заполнить заново</button>
+                <button class="calc-btn" style="flex: 1; background: #f06292;" onclick="resetCalculator()">Заполнить заново</button>
             </div>
         </div>
     </div>
@@ -1077,7 +1078,11 @@ function editRow(index) {
         }
     }
     function saveProjects() {
-        localStorage.setItem('knittingProjects', JSON.stringify(projects));
+        const json = JSON.stringify(projects);
+        localStorage.setItem('knittingProjects', json);
+        if (typeof Android !== 'undefined' && Android.saveProjects) {
+            Android.saveProjects(json);
+        }
     }
     // Функции для схем
     function renderSchemes() {
