@@ -15,7 +15,6 @@
             --shadow: 0 4px 12px rgba(0,0,0,0.08);
             --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +22,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             -webkit-tap-highlight-color: transparent; /* ✅ Убирает синий квадрат при нажатии */
         }
-
         body {
             background: var(--light);
             color: var(--dark);
@@ -33,18 +31,15 @@
                               radial-gradient(circle at 75% 75%, rgba(248, 205, 202, 0.2) 0%, transparent 50%);
             background-attachment: fixed;
         }
-
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 0 8px;
         }
-
         header {
             text-align: center;
             padding: 20px 0 10px;
         }
-
         h1 {
             font-size: 2rem;
             color: var(--dark);
@@ -52,13 +47,11 @@
             font-weight: 600;
             line-height: 1.2;
         }
-
         .subtitle {
             font-size: 1rem;
             color: #8a7c94;
             font-weight: 300;
         }
-
         /* Навигация и кнопки */
         .nav-buttons {
             display: flex;
@@ -67,7 +60,6 @@
             margin: 20px 0;
             flex-wrap: wrap;
         }
-
         .nav-btn,
         .upload-btn,
         .calc-btn,
@@ -81,7 +73,6 @@
             box-shadow: var(--shadow);
             font-size: 1rem;
         }
-
         .nav-btn {
             background: white;
             border: 2px solid var(--primary);
@@ -91,13 +82,11 @@
             flex: 1 1 120px;
             max-width: 200px;
         }
-
         .nav-btn:hover {
             background: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
         /* Проекты */
         .projects-grid {
             display: grid;
@@ -105,12 +94,10 @@
             gap: 16px;
             margin-top: 16px;
         }
-
         .project-wrapper {
             position: relative;
             display: inline-block;
         }
-
         .project-card {
             aspect-ratio: 1;
             background: white;
@@ -128,36 +115,30 @@
             width: 100%;
             height: 100%;
         }
-
         .project-card:hover {
             transform: scale(1.03);
             border-color: var(--primary);
             box-shadow: 0 6px 16px rgba(0,0,0,0.1);
         }
-
         .project-icon {
             font-size: 2rem;
             margin-bottom: 12px;
             color: var(--primary);
         }
-
         .project-name {
             font-weight: 600;
             font-size: 0.95rem;
             word-break: break-word;
             line-height: 1.3;
         }
-
         .add-project {
             background: #FEF7F9; /* Новый цвет фона */
             color: var(--dark);
         }
-
         .add-project .project-icon {
             color: var(--dark);
             font-size: 3.2rem;
         }
-
         .delete-project-card {
             position: absolute;
             top: -8px;
@@ -178,12 +159,10 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
             transition: all 0.2s ease;
         }
-
         .delete-project-card:hover {
             background: #e07a5f;
             transform: scale(1.1);
         }
-
         /* Модальное окно проекта */
         .modal {
             display: none;
@@ -198,7 +177,6 @@
             justify-content: center;
             padding: 16px;
         }
-
         .modal-content {
             background: white;
             padding: 24px 20px;
@@ -211,12 +189,10 @@
             overflow-y: auto;
             max-height: 90vh;
         }
-
         @keyframes modalIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
-
         .close-modal {
             position: absolute;
             top: 12px;
@@ -226,11 +202,9 @@
             color: #aaa;
             transition: color 0.3s;
         }
-
         .close-modal:hover {
             color: var(--dark);
         }
-
         .modal-title {
             font-size: 1.5rem;
             margin-bottom: 16px;
@@ -240,7 +214,6 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .edit-title {
             background: none;
             border: none;
@@ -255,17 +228,14 @@
             font-family: inherit;
             line-height: 1.3;
         }
-
         .edit-title:focus {
             outline: none;
             border-bottom: 2px dashed var(--primary);
         }
-
         /* Счётчики */
         .counters-list {
             margin: 20px 0;
         }
-
         .counter-item {
             background: var(--secondary);
             padding: 12px;
@@ -276,13 +246,11 @@
             gap: 8px;
             border: 1px solid var(--primary);
         }
-
         .counter-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .counter-name {
             font-weight: 600;
             font-size: 1rem;
@@ -297,19 +265,16 @@
             min-width: 0;
             margin-right: 8px;
         }
-
         .counter-name:focus {
             outline: none;
             text-decoration: underline;
         }
-
         .counter-controls {
             display: flex;
             flex-direction: column;
             gap: 12px;
             align-items: stretch;
         }
-
         .control-group {
             display: flex;
             align-items: center;
@@ -318,7 +283,6 @@
             padding: 8px 12px;
             border-radius: 8px;
         }
-
         .control-label {
             font-size: 0.9rem;
             font-weight: 600;
@@ -327,17 +291,14 @@
             align-items: center;
             gap: 6px;
         }
-
         .control-label i {
             font-size: 1.1rem;
         }
-
         .control-value {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-
         .counter-value {
             font-size: 1.3rem;
             font-weight: bold;
@@ -349,11 +310,9 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-
         .counter-value:hover {
             background: rgba(255,255,255,0.5);
         }
-
         .counter-btn {
             background: var(--primary);
             color: white;
@@ -369,11 +328,9 @@
             align-items: center;
             justify-content: center;
         }
-
         .counter-btn:hover {
             transform: scale(1.08);
         }
-
         /* Кнопки с уникальными стилями */
         .add-counter-btn {
             background: rgba(255, 255, 255, 0.8);
@@ -387,13 +344,11 @@
             justify-content: center;
             gap: 8px;
         }
-
         .add-counter-btn:hover {
             background: rgba(255, 255, 255, 0.9);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
-
         .delete-project-btn {
             background: #e07a5f;
             color: white;
@@ -401,12 +356,10 @@
             margin-top: 12px;
             width: 100%;
         }
-
         .delete-project-btn:hover {
             background: #c95b43;
             transform: translateY(-2px);
         }
-
         /* Секция схем */
         .gallery-grid {
             display: grid;
@@ -414,7 +367,6 @@
             gap: 16px;
             margin-top: 16px;
         }
-
         .gallery-item {
             aspect-ratio: 1;
             background: var(--secondary);
@@ -432,19 +384,16 @@
             padding: 8px;
             text-align: center;
         }
-
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 10px;
         }
-
         .gallery-item:hover {
             transform: scale(1.02);
             box-shadow: var(--shadow);
         }
-
         .delete-scheme-btn {
             position: absolute;
             top: 5px;
@@ -465,18 +414,15 @@
             opacity: 0.7;
             transition: opacity 0.2s, background-color 0.2s;
         }
-
         .delete-scheme-btn:hover {
             opacity: 1;
             background: rgba(224, 122, 95, 0.9);
         }
-
         @media (max-width: 768px) {
             .delete-scheme-btn {
                 opacity: 1;
             }
         }
-
         .upload-btn {
             background: #ffbb8a;
             color: white;
@@ -488,34 +434,29 @@
             margin-left: auto;
             margin-right: auto;
         }
-
         .upload-btn:hover {
             background: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
-
         /* Калькулятор */
         #calculator {
             padding: 0 8px;
             overflow-y: auto; /* Разрешаем вертикальный скролл, если контент не помещается */
             max-height: calc(100vh - 120px); /* Ограничиваем высоту, чтобы не перекрывалась навигация */
         }
-
         .calculator-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
             margin-top: 16px;
         }
-
         .calc-group {
             background: white;
             padding: 16px;
             border-radius: 12px;
             box-shadow: var(--shadow);
         }
-
         .calc-title {
             font-weight: 600;
             margin-bottom: 12px;
@@ -523,18 +464,15 @@
             text-align: center;
             font-size: 1.2rem;
         }
-
         .calc-input-group {
             margin-bottom: 12px;
         }
-
         .calc-label {
             display: block;
             margin-bottom: 4px;
             font-size: 0.85rem;
             color: #666;
         }
-
         .calc-input {
             width: 100%;
             padding: 10px;
@@ -543,12 +481,10 @@
             font-size: 1rem;
             transition: var(--transition);
         }
-
         .calc-input:focus {
             outline: none;
             border-color: var(--primary);
         }
-
         .calc-result {
             background: var(--secondary);
             padding: 20px;
@@ -561,7 +497,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 1px solid var(--primary);
         }
-
         .calc-result p {
             margin: 0;
             display: flex;
@@ -570,12 +505,10 @@
             gap: 8px;
             font-size: 1.2rem;
         }
-
         .calc-result i {
             font-size: 1.5rem;
             color: var(--accent);
         }
-
         .calc-btn {
             background: #ffbb8a;
             color: white;
@@ -585,150 +518,120 @@
             margin-top: 12px;
             box-shadow: var(--shadow);
         }
-
         .calc-btn:hover {
             background: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.12);
         }
-
         .calc-step {
             display: none;
         }
-
         #step1 {
             display: block;
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
 /* Универсальная адаптация под все современные телефоны */
 /* Используем не только ширину, но и безопасные зоны */
-
 /* Основной body: добавляем отступы для безопасных зон */
 body {
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     /* ... остальные ваши стили для body ... */
 }
-
 /* Адаптация для компактных экранов (до 768px) */
 @media (max-width: 768px) {
     body {
         padding: calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 8px);
     }
-
     h1 {
         font-size: 1.8rem;
         line-height: 1.2;
     }
-
     .subtitle {
         font-size: 0.95rem;
     }
-
     .nav-btn {
         min-width: 80px;
         padding: 8px 12px;
         font-size: 0.9rem;
         flex: 1 1 100px;
     }
-
     .projects-grid {
         grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
         gap: 12px;
     }
-
     .project-icon {
         font-size: 1.8rem;
     }
-
     .project-name {
         font-size: 0.9rem;
     }
-
     .modal-content {
         padding: 20px 16px;
         max-width: 95vw;
         max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);
     }
-
     .modal-title {
         font-size: 1.3rem;
     }
-
     .edit-title {
         font-size: 1.3rem;
     }
-
     .counter-value {
         font-size: 1.2rem;
         min-width: 45px;
     }
-
     .counter-header .counter-btn {
         background: #e07a5f;
         width: 30px;
         height: 30px;
         font-size: 0.9rem;
     }
-
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 12px;
     }
-
     .gallery-item {
         font-size: 0.85rem;
         padding: 6px;
     }
-
     /* Калькулятор: убираем боковые отступы, если они есть */
     #calculator {
         padding: 0;
     }
-
     .calc-group {
         padding: 16px 12px;
     }
 }
-
 /* Для очень маленьких экранов или в ландшафтном режиме */
 @media (max-width: 480px) and (max-height: 480px) {
     .projects-grid {
         grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
         gap: 8px;
     }
-
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 8px;
     }
-
     .counter-controls {
         gap: 8px;
     }
-
     .control-group {
         padding: 6px 8px;
     }
 }
-
         @media (min-width: 769px) {
             .calculator-grid { grid-template-columns: 1fr 1fr; }
         }
-
         @media (min-width: 1024px) {
             body { padding: 30px; }
             .container { max-width: 1200px; }
             .projects-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; }
         }
-
         .section { display: none; }
         #projects { display: block; }
-
         /* Стиль для модального окна изображения */
         #imageModal {
             display: none;
@@ -738,7 +641,6 @@ body {
             justify-content: center !important;
             z-index: 200;
         }
-
         #imageModal .close-modal {
             color: white;
             background: rgba(0,0,0,0.5);
@@ -754,15 +656,12 @@ body {
             right: 20px;
             cursor: pointer;
         }
-
         #imageModal .close-modal:hover {
             background: rgba(0,0,0,0.8);
         }
-
     </style>
 </head>
 <body>
-<!-- Остальной HTML-код (тело, скрипты) остается полностью без изменений -->
 <div class="container">
     <header>
         <h1>Клубок</h1>
@@ -866,26 +765,27 @@ body {
     </div>
 </div>
 <script>
-    // JavaScript код остается полностью без изменений
     let projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
     let currentProjectIndex = -1;
     let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
+    window.isProjectModalOpen = false; // ✅ Добавлено: флаг открытого модального окна
+
     document.addEventListener('DOMContentLoaded', function() {
         renderProjects();
         renderSchemes();
-        showSection('projects'); // Показываем первую вкладку по умолчанию
+        showSection('projects');
     });
+
     function showSection(sectionId) {
         document.querySelectorAll('.section').forEach(section => {
             section.style.display = 'none';
         });
         document.getElementById(sectionId).style.display = 'block';
     }
-    // ✅ ИСПРАВЛЕНО: Крестик ВНЕ карточки
+
     function renderProjects() {
         const grid = document.getElementById('projectsGrid');
         grid.innerHTML = '';
-        // Кнопка добавления нового проекта
         const addProjectWrapper = document.createElement('div');
         addProjectWrapper.className = 'project-wrapper';
         addProjectWrapper.innerHTML = `
@@ -895,7 +795,7 @@ body {
         `;
         addProjectWrapper.querySelector('.project-card').onclick = createNewProject;
         grid.appendChild(addProjectWrapper);
-        // Существующие проекты
+
         projects.forEach((project, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'project-wrapper';
@@ -915,26 +815,29 @@ body {
             grid.appendChild(wrapper);
         });
     }
+
     function createNewProject() {
         const newProject = { name: 'Новый проект', counters: [] };
         projects.push(newProject);
         saveProjects();
         openProject(projects.length - 1);
     }
+
     function openProject(index) {
         currentProjectIndex = index;
         const project = projects[index];
         document.getElementById('projectTitleInput').value = project.name;
         renderCounters();
         document.getElementById('projectModal').style.display = 'flex';
+        window.isProjectModalOpen = true; // ✅ Установка флага
     }
+
     function closeModal() {
         if (currentProjectIndex !== -1) {
             const newName = document.getElementById('projectTitleInput').value.trim();
             if (newName) {
                 projects[currentProjectIndex].name = newName;
             }
-            // ✅ АВТОУДАЛЕНИЕ: Если нет счётчиков — удаляем проект
             if (projects[currentProjectIndex].counters.length === 0) {
                 projects.splice(currentProjectIndex, 1);
             }
@@ -942,8 +845,10 @@ body {
             currentProjectIndex = -1;
         }
         document.getElementById('projectModal').style.display = 'none';
+        window.isProjectModalOpen = false; // ✅ Сброс флага
         renderProjects();
     }
+
     function renderCounters() {
         const list = document.getElementById('countersList');
         list.innerHTML = '';
@@ -982,6 +887,7 @@ body {
             list.appendChild(counterDiv);
         });
     }
+
     function addCounter() {
         if (currentProjectIndex === -1) return;
         const newCounter = { name: 'Новый счётчик', stitches: 0, rows: 0 };
@@ -989,16 +895,17 @@ body {
         saveProjects();
         renderCounters();
     }
+
     function updateCounterName(index, value) {
         if (value.trim()) {
             projects[currentProjectIndex].counters[index].name = value.trim();
             saveProjects();
         }
     }
+
     function removeCounter(index) {
         if (confirm('Удалить этот счётчик?')) {
             projects[currentProjectIndex].counters.splice(index, 1);
-            // ✅ АВТОУДАЛЕНИЕ: Если это был последний счётчик — удаляем проект
             if (projects[currentProjectIndex].counters.length === 0) {
                 projects.splice(currentProjectIndex, 1);
                 currentProjectIndex = -1;
@@ -1010,11 +917,13 @@ body {
             renderCounters();
         }
     }
+
     function incrementStitch(index) {
         projects[currentProjectIndex].counters[index].stitches++;
         document.getElementById(`stitch-${index}`).textContent = projects[currentProjectIndex].counters[index].stitches;
         saveProjects();
     }
+
     function decrementStitch(index) {
         if (projects[currentProjectIndex].counters[index].stitches > 0) {
             projects[currentProjectIndex].counters[index].stitches--;
@@ -1022,11 +931,13 @@ body {
             saveProjects();
         }
     }
+
     function incrementRow(index) {
         projects[currentProjectIndex].counters[index].rows++;
         document.getElementById(`row-${index}`).textContent = projects[currentProjectIndex].counters[index].rows;
         saveProjects();
     }
+
     function decrementRow(index) {
         if (projects[currentProjectIndex].counters[index].rows > 0) {
             projects[currentProjectIndex].counters[index].rows--;
@@ -1034,30 +945,33 @@ body {
             saveProjects();
         }
     }
-function editStitch(index) {
-    showCustomPrompt('Введите новое количество петель:', projects[currentProjectIndex].counters[index].stitches, (value) => {
-        const num = parseInt(value);
-        if (!isNaN(num) && num >= 0) {
-            projects[currentProjectIndex].counters[index].stitches = num;
-            document.getElementById(`stitch-${index}`).textContent = num;
-            saveProjects();
-        } else {
-            alert('Пожалуйста, введите корректное число.');
-        }
-    });
-}
-function editRow(index) {
-    showCustomPrompt('Введите новое количество рядов:', projects[currentProjectIndex].counters[index].rows, (value) => {
-        const num = parseInt(value);
-        if (!isNaN(num) && num >= 0) {
-            projects[currentProjectIndex].counters[index].rows = num;
-            document.getElementById(`row-${index}`).textContent = num;
-            saveProjects();
-        } else {
-            alert('Пожалуйста, введите корректное число.');
-        }
-    });
-}
+
+    function editStitch(index) {
+        showCustomPrompt('Введите новое количество петель:', projects[currentProjectIndex].counters[index].stitches, (value) => {
+            const num = parseInt(value);
+            if (!isNaN(num) && num >= 0) {
+                projects[currentProjectIndex].counters[index].stitches = num;
+                document.getElementById(`stitch-${index}`).textContent = num;
+                saveProjects();
+            } else {
+                alert('Пожалуйста, введите корректное число.');
+            }
+        });
+    }
+
+    function editRow(index) {
+        showCustomPrompt('Введите новое количество рядов:', projects[currentProjectIndex].counters[index].rows, (value) => {
+            const num = parseInt(value);
+            if (!isNaN(num) && num >= 0) {
+                projects[currentProjectIndex].counters[index].rows = num;
+                document.getElementById(`row-${index}`).textContent = num;
+                saveProjects();
+            } else {
+                alert('Пожалуйста, введите корректное число.');
+            }
+        });
+    }
+
     function deleteProject() {
         if (currentProjectIndex === -1 || currentProjectIndex >= projects.length) return;
         if (confirm('Ты уверена, что хочешь удалить этот проект? Все данные будут потеряны.')) {
@@ -1068,7 +982,7 @@ function editRow(index) {
             closeModal();
         }
     }
-    // ✅ ИСПРАВЛЕНО: Удаление проекта по крестику
+
     function deleteProjectCard(index, event) {
         event.stopPropagation();
         if (confirm('Удалить этот проект?')) {
@@ -1077,6 +991,7 @@ function editRow(index) {
             renderProjects();
         }
     }
+
     function saveProjects() {
         const json = JSON.stringify(projects);
         localStorage.setItem('knittingProjects', json);
@@ -1084,6 +999,7 @@ function editRow(index) {
             Android.saveProjects(json);
         }
     }
+
     // Функции для схем
     function renderSchemes() {
         const grid = document.getElementById('galleryGrid');
@@ -1101,6 +1017,7 @@ function editRow(index) {
             grid.appendChild(item);
         });
     }
+
     function addImage(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -1113,13 +1030,16 @@ function editRow(index) {
             reader.readAsDataURL(input.files[0]);
         }
     }
+
     function openImageModal(imageUrl) {
         document.getElementById('modalImage').src = imageUrl;
         document.getElementById('imageModal').style.display = 'flex';
     }
+
     function closeImageModal() {
         document.getElementById('imageModal').style.display = 'none';
     }
+
     function deleteScheme(index, event) {
         event.stopPropagation();
         if (confirm('Удалить эту схему?')) {
@@ -1128,10 +1048,12 @@ function editRow(index) {
             renderSchemes();
         }
     }
+
     function saveSchemes() {
         localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
     }
-    // ✅ НОВАЯ ЛОГИКА: Пошаговый калькулятор
+
+    // Калькулятор
     function nextStep() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
         const currentLength = parseFloat(document.getElementById('currentLength').value);
@@ -1145,6 +1067,7 @@ function editRow(index) {
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
     }
+
     function calculate() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
         const currentLength = parseFloat(document.getElementById('currentLength').value);
@@ -1167,126 +1090,121 @@ function editRow(index) {
         document.getElementById('step2').style.display = 'none';
         document.getElementById('step3').style.display = 'block';
     }
+
     function backToStep2() {
         document.getElementById('step3').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
     }
-function resetCalculator() {
-    document.getElementById('currentWidth').value = '';
-    document.getElementById('currentLength').value = '';
-    document.getElementById('currentStitches').value = '';
-    document.getElementById('currentRows').value = '';
-    document.getElementById('desiredWidth').value = '';
-    document.getElementById('desiredLength').value = '';
-    document.getElementById('calcResult').innerHTML = '';
-    document.getElementById('step3').style.display = 'none';
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('step1').style.display = 'block';
-}
+
+    function resetCalculator() {
+        document.getElementById('currentWidth').value = '';
+        document.getElementById('currentLength').value = '';
+        document.getElementById('currentStitches').value = '';
+        document.getElementById('currentRows').value = '';
+        document.getElementById('desiredWidth').value = '';
+        document.getElementById('desiredLength').value = '';
+        document.getElementById('calcResult').innerHTML = '';
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step1').style.display = 'block';
+    }
+
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-// ✅ Функция для создания кастомного диалога вместо prompt()
-function showCustomPrompt(title, defaultValue, callback) {
-    // Создаем элемент модального окна
-    const modal = document.createElement('div');
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '9999';
-    modal.style.padding = '16px';
 
-    // Содержимое диалога
-    const dialog = document.createElement('div');
-    dialog.style.backgroundColor = 'white';
-    dialog.style.borderRadius = '12px';
-    dialog.style.padding = '20px';
-    dialog.style.width = '90%';
-    dialog.style.maxWidth = '300px';
-    dialog.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-    dialog.style.display = 'flex';
-    dialog.style.flexDirection = 'column';
-    dialog.style.gap = '16px';
+    function showCustomPrompt(title, defaultValue, callback) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '9999';
+        modal.style.padding = '16px';
 
-    // Заголовок
-    const titleEl = document.createElement('h3');
-    titleEl.textContent = title;
-    titleEl.style.margin = '0 0 12px';
-    titleEl.style.fontWeight = '600';
-    titleEl.style.color = '#5d4a66';
-    dialog.appendChild(titleEl);
+        const dialog = document.createElement('div');
+        dialog.style.backgroundColor = 'white';
+        dialog.style.borderRadius = '12px';
+        dialog.style.padding = '20px';
+        dialog.style.width = '90%';
+        dialog.style.maxWidth = '300px';
+        dialog.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+        dialog.style.display = 'flex';
+        dialog.style.flexDirection = 'column';
+        dialog.style.gap = '16px';
 
-    // Поле ввода
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.value = defaultValue;
-    input.style.width = '100%';
-    input.style.padding = '10px';
-    input.style.border = '2px solid #eee';
-    input.style.borderRadius = '8px';
-    input.style.fontSize = '1rem';
-    input.style.outline = 'none';
-    input.style.transition = 'border-color 0.3s';
-    input.style.minHeight = '40px';
-    input.focus();
-    dialog.appendChild(input);
+        const titleEl = document.createElement('h3');
+        titleEl.textContent = title;
+        titleEl.style.margin = '0 0 12px';
+        titleEl.style.fontWeight = '600';
+        titleEl.style.color = '#5d4a66';
+        dialog.appendChild(titleEl);
 
-    // Кнопки
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.gap = '12px';
-    buttonContainer.style.justifyContent = 'flex-end';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = defaultValue;
+        input.style.width = '100%';
+        input.style.padding = '10px';
+        input.style.border = '2px solid #eee';
+        input.style.borderRadius = '8px';
+        input.style.fontSize = '1rem';
+        input.style.outline = 'none';
+        input.style.transition = 'border-color 0.3s';
+        input.style.minHeight = '40px';
+        input.focus();
+        dialog.appendChild(input);
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Отменить';
-    cancelBtn.style.background = '#fcd9b8';
-    cancelBtn.style.color = '#5d4a66';
-    cancelBtn.style.border = 'none';
-    cancelBtn.style.padding = '8px 16px';
-    cancelBtn.style.borderRadius = '8px';
-    cancelBtn.style.cursor = 'pointer';
-    cancelBtn.style.fontWeight = '600';
-    cancelBtn.onclick = () => {
-        document.body.removeChild(modal);
-    };
-    buttonContainer.appendChild(cancelBtn);
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.gap = '12px';
+        buttonContainer.style.justifyContent = 'flex-end';
 
-    const okBtn = document.createElement('button');
-    okBtn.textContent = 'ОК';
-    okBtn.style.background = '#5d4a66';
-    okBtn.style.color = 'white';
-    okBtn.style.border = 'none';
-    okBtn.style.padding = '8px 16px';
-    okBtn.style.borderRadius = '8px';
-    okBtn.style.cursor = 'pointer';
-    okBtn.style.fontWeight = '600';
-    okBtn.onclick = () => {
-        const value = input.value;
-        callback(value);
-        document.body.removeChild(modal);
-    };
-    buttonContainer.appendChild(okBtn);
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Отменить';
+        cancelBtn.style.background = '#fcd9b8';
+        cancelBtn.style.color = '#5d4a66';
+        cancelBtn.style.border = 'none';
+        cancelBtn.style.padding = '8px 16px';
+        cancelBtn.style.borderRadius = '8px';
+        cancelBtn.style.cursor = 'pointer';
+        cancelBtn.style.fontWeight = '600';
+        cancelBtn.onclick = () => {
+            document.body.removeChild(modal);
+        };
+        buttonContainer.appendChild(cancelBtn);
 
-    dialog.appendChild(buttonContainer);
-    modal.appendChild(dialog);
-    document.body.appendChild(modal);
+        const okBtn = document.createElement('button');
+        okBtn.textContent = 'ОК';
+        okBtn.style.background = '#5d4a66';
+        okBtn.style.color = 'white';
+        okBtn.style.border = 'none';
+        okBtn.style.padding = '8px 16px';
+        okBtn.style.borderRadius = '8px';
+        okBtn.style.cursor = 'pointer';
+        okBtn.style.fontWeight = '600';
+        okBtn.onclick = () => {
+            const value = input.value;
+            callback(value);
+            document.body.removeChild(modal);
+        };
+        buttonContainer.appendChild(okBtn);
 
-    // Обработка клика вне диалога
-    modal.onclick = () => {
-        document.body.removeChild(modal);
-    };
+        dialog.appendChild(buttonContainer);
+        modal.appendChild(dialog);
+        document.body.appendChild(modal);
 
-    // Предотвращаем распространение кликов на кнопки внутри диалога
-    dialog.onclick = (e) => e.stopPropagation();
-}
+        modal.onclick = () => {
+            document.body.removeChild(modal);
+        };
+        dialog.onclick = (e) => e.stopPropagation();
+    }
 </script>
 </body>
 </html>

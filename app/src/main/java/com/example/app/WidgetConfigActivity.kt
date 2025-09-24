@@ -3,7 +3,6 @@ package com.example.app
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,13 +13,10 @@ import android.widget.Toast
 import org.json.JSONArray
 
 class WidgetConfigActivity : Activity() {
-
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
-    private lateinit var configContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
@@ -32,21 +28,17 @@ class WidgetConfigActivity : Activity() {
         }
 
         setContentView(R.layout.widget_config_layout)
-        configContainer = findViewById(R.id.config_container)
-
-        // Читаем данные из SharedPreferences
-        val prefs = getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
-        val projectsJson = prefs.getString("knittingProjects", "[]") ?: "[]"
-
+        val projectsJson = getWidgetPrefs().getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
         loadCountersFromJson(projectsJson)
     }
 
     private fun loadCountersFromJson(projectsJson: String) {
         runOnUiThread {
-            configContainer.removeAllViews()
+            val container = findViewById<LinearLayout>(R.id.config_container)
+            container.removeAllViews()
 
             if (projectsJson == "[]" || projectsJson.isBlank()) {
-                showEmptyMessage()
+                showEmptyMessage(container)
                 return@runOnUiThread
             }
 
@@ -56,67 +48,51 @@ class WidgetConfigActivity : Activity() {
 
                 for (i in 0 until projects.length()) {
                     val project = projects.getJSONObject(i)
-                    val projectName = project.getString("name")
                     val counters = project.getJSONArray("counters")
 
                     for (j in 0 until counters.length()) {
                         hasCounters = true
                         val counter = counters.getJSONObject(j)
-                        val counterName = counter.getString("name")
-                        val fullCounterName = "$projectName: $counterName"
+                        val fullCounterName = "${project.getString("name")}: ${counter.getString("name")}"
                         val counterId = "$i-$j"
 
                         val item = LayoutInflater.from(this)
-                            .inflate(R.layout.widget_config_item, configContainer, false) as LinearLayout
-                        val textView = item.findViewById<TextView>(R.id.counter_name)
-                        textView.text = fullCounterName
-
-                        val layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        layoutParams.setMargins(0, 0, 0, 8)
-                        item.layoutParams = layoutParams
+                            .inflate(R.layout.widget_config_item, container, false) as LinearLayout
+                        item.findViewById<TextView>(R.id.counter_name).text = fullCounterName
 
                         item.setOnClickListener {
                             saveSelection(counterId, projectsJson)
                         }
-
-                        configContainer.addView(item)
+                        container.addView(item)
                     }
                 }
 
-                if (!hasCounters) {
-                    showEmptyMessage()
-                }
-
+                if (!hasCounters) showEmptyMessage(container)
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
-                showEmptyMessage()
+                showEmptyMessage(container)
             }
         }
     }
 
-    private fun showEmptyMessage() {
+    private fun showEmptyMessage(container: LinearLayout) {
         val item = LayoutInflater.from(this)
-            .inflate(R.layout.widget_config_item, configContainer, false) as LinearLayout
-        val textView = item.findViewById<TextView>(R.id.counter_name)
-        textView.text = "Создайте проект в приложении"
-        textView.setTextColor(0xFF9E9E9E.toInt())
-        textView.isEnabled = false
-        configContainer.addView(item)
+            .inflate(R.layout.widget_config_item, container, false) as LinearLayout
+        val tv = item.findViewById<TextView>(R.id.counter_name)
+        tv.text = "Создайте проект в приложении"
+        tv.setTextColor(0xFF9E9E9E.toInt())
+        tv.isEnabled = false
+        container.addView(item)
     }
 
     private fun saveSelection(counterId: String, projectsJson: String) {
-        val prefs = getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
-        prefs.edit()
-            .putString("widget_counter_id_$appWidgetId", counterId)
-            .putString("knittingProjects", projectsJson)
-            .apply()
+        getWidgetPrefs().edit {
+            putString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", counterId)
+            putString(PrefKeys.KNITTING_PROJECTS, projectsJson)
+        }
 
-        val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        setResult(RESULT_OK, resultValue)
+        setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         finish()
     }
 }

@@ -1,3 +1,4 @@
+// src/main/java/com/example/app/MainActivity.kt
 package com.example.app
 
 import android.Manifest
@@ -27,24 +28,33 @@ import android.content.ComponentName
 import android.webkit.JavascriptInterface
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var webView: WebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private val FILE_CHOOSER_REQUEST_CODE = 1
-
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { }
 
-    // BroadcastReceiver для обновления из виджета
     private val widgetUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == "com.example.app.WIDGET_UPDATE") {
                 val projectsJson = intent.getStringExtra("knittingProjects") ?: return
+                val safeJson = projectsJson.replace("'", "\\'")
                 webView.evaluateJavascript(
-                    "localStorage.setItem('knittingProjects', '${projectsJson.replace("'", "\\'")}'); " +
-                            "projects = JSON.parse(localStorage.getItem('knittingProjects') || '[]'); " +
-                            "if (currentProjectIndex !== -1) renderCounters();",
+                    """
+                    (function() {
+                        try {
+                            localStorage.setItem('knittingProjects', '$safeJson');
+                            window.projects = JSON.parse('$safeJson');
+                            renderProjects();
+                            if (window.isProjectModalOpen) {
+                                renderCounters();
+                            }
+                        } catch (e) {
+                            console.error('Ошибка обновления из виджета:', e);
+                        }
+                    })();
+                    """.trimIndent(),
                     null
                 )
             }
@@ -56,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
-
         webView = findViewById(R.id.webview)
 
         with(webView.settings) {
@@ -67,15 +76,15 @@ class MainActivity : AppCompatActivity() {
             loadWithOverviewMode = true
         }
 
-        // Загружаем данные из SharedPreferences при старте
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 val prefs = getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
                 val projectsJson = prefs.getString("knittingProjects", null)
                 if (projectsJson != null) {
+                    val safeJson = projectsJson.replace("'", "\\'")
                     webView.evaluateJavascript(
-                        "localStorage.setItem('knittingProjects', '${projectsJson.replace("'", "\\'")}'); " +
+                        "localStorage.setItem('knittingProjects', '$safeJson'); " +
                                 "projects = JSON.parse(localStorage.getItem('knittingProjects') || '[]');",
                         null
                     )
@@ -84,7 +93,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
-
         webView.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
                 webView: WebView?,
@@ -93,7 +101,6 @@ class MainActivity : AppCompatActivity() {
             ): Boolean {
                 this@MainActivity.filePathCallback?.onReceiveValue(null)
                 this@MainActivity.filePathCallback = filePathCallback
-
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                     val permission = Manifest.permission.READ_EXTERNAL_STORAGE
                     if (ContextCompat.checkSelfPermission(this@MainActivity, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -101,7 +108,6 @@ class MainActivity : AppCompatActivity() {
                         return false
                     }
                 }
-
                 return try {
                     val intent = fileChooserParams?.createIntent()?.apply { type = "image/*" }
                     if (intent != null) {
@@ -151,12 +157,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Регистрируем BroadcastReceiver (как вы просили)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            registerReceiver(widgetUpdateReceiver, IntentFilter("com.example.app.WIDGET_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(widgetUpdateReceiver, IntentFilter("com.example.app.WIDGET_UPDATE"))
-        }
+        // ✅ Безопасная регистрация ресивера для всех версий Android
+        ContextCompat.registerReceiver(
+            this,
+            widgetUpdateReceiver,
+            IntentFilter("com.example.app.WIDGET_UPDATE"),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -172,16 +179,13 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    // Интерфейс для синхронизации с виджетом
-    class WebAppInterface(private val context: Context) {
+    inner class WebAppInterface(private val context: Context) {
         @JavascriptInterface
         fun saveProjects(projectsJson: String) {
-            val prefs = context.getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
-            prefs.edit()
+            context.getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE).edit()
                 .putString("knittingProjects", projectsJson)
                 .apply()
 
-            // Обновляем все виджеты
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val ids = appWidgetManager.getAppWidgetIds(ComponentName(context, KnittingCounterWidget::class.java))
             KnittingCounterWidget.updateAppWidget(context, appWidgetManager, *ids)
