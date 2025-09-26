@@ -1,4 +1,3 @@
-// src/main/java/com/example/app/Utils.kt
 package com.example.app
 
 import android.content.Context

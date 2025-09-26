@@ -765,10 +765,15 @@ body {
     </div>
 </div>
 <script>
-    let projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
+    // ✅ ИЗМЕНЕНО: Объявляем projects как window.projects, чтобы MainActivity могла обновить переменную
+    window.projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
+    // Индекс текущего открытого проекта (-1 если ни один не открыт)
     let currentProjectIndex = -1;
+    // Схемы
     let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
-    window.isProjectModalOpen = false; // ✅ Добавлено: флаг открытого модального окна
+
+    // ✅ Добавлено: флаг открытого модального окна, доступный для MainActivity
+    window.isProjectModalOpen = false;
 
     document.addEventListener('DOMContentLoaded', function() {
         renderProjects();
@@ -795,7 +800,6 @@ body {
         `;
         addProjectWrapper.querySelector('.project-card').onclick = createNewProject;
         grid.appendChild(addProjectWrapper);
-
         projects.forEach((project, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'project-wrapper';
@@ -829,7 +833,7 @@ body {
         document.getElementById('projectTitleInput').value = project.name;
         renderCounters();
         document.getElementById('projectModal').style.display = 'flex';
-        window.isProjectModalOpen = true; // ✅ Установка флага
+        window.isProjectModalOpen = true; // ✅ Установка флага при открытии
     }
 
     function closeModal() {
@@ -845,13 +849,23 @@ body {
             currentProjectIndex = -1;
         }
         document.getElementById('projectModal').style.display = 'none';
-        window.isProjectModalOpen = false; // ✅ Сброс флага
+        window.isProjectModalOpen = false; // ✅ Сброс флага при закрытии
         renderProjects();
     }
 
-    function renderCounters() {
+    // ✅ Функция обновления интерфейса счётчиков, теперь объявлена как window.renderCounters
+    window.renderCounters = function() {
+        console.log("renderCounters вызвана.");
         const list = document.getElementById('countersList');
+        if (!list) {
+             console.error("Элемент #countersList не найден.");
+             return;
+        }
         list.innerHTML = '';
+        if (currentProjectIndex === -1 || currentProjectIndex >= projects.length) {
+             console.warn("currentProjectIndex некорректен:", currentProjectIndex);
+             return;
+        }
         const project = projects[currentProjectIndex];
         project.counters.forEach((counter, idx) => {
             const counterDiv = document.createElement('div');
@@ -1000,7 +1014,7 @@ body {
         }
     }
 
-    // Функции для схем
+    // Функции для схем (остаются без изменений)
     function renderSchemes() {
         const grid = document.getElementById('galleryGrid');
         grid.innerHTML = '';
@@ -1053,7 +1067,7 @@ body {
         localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
     }
 
-    // Калькулятор
+    // Калькулятор (остаётся без изменений)
     function nextStep() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
         const currentLength = parseFloat(document.getElementById('currentLength').value);
@@ -1128,7 +1142,6 @@ body {
         modal.style.alignItems = 'center';
         modal.style.zIndex = '9999';
         modal.style.padding = '16px';
-
         const dialog = document.createElement('div');
         dialog.style.backgroundColor = 'white';
         dialog.style.borderRadius = '12px';
@@ -1139,14 +1152,12 @@ body {
         dialog.style.display = 'flex';
         dialog.style.flexDirection = 'column';
         dialog.style.gap = '16px';
-
         const titleEl = document.createElement('h3');
         titleEl.textContent = title;
         titleEl.style.margin = '0 0 12px';
         titleEl.style.fontWeight = '600';
         titleEl.style.color = '#5d4a66';
         dialog.appendChild(titleEl);
-
         const input = document.createElement('input');
         input.type = 'number';
         input.value = defaultValue;
@@ -1160,12 +1171,10 @@ body {
         input.style.minHeight = '40px';
         input.focus();
         dialog.appendChild(input);
-
         const buttonContainer = document.createElement('div');
         buttonContainer.style.display = 'flex';
         buttonContainer.style.gap = '12px';
         buttonContainer.style.justifyContent = 'flex-end';
-
         const cancelBtn = document.createElement('button');
         cancelBtn.textContent = 'Отменить';
         cancelBtn.style.background = '#fcd9b8';
@@ -1179,7 +1188,6 @@ body {
             document.body.removeChild(modal);
         };
         buttonContainer.appendChild(cancelBtn);
-
         const okBtn = document.createElement('button');
         okBtn.textContent = 'ОК';
         okBtn.style.background = '#5d4a66';
@@ -1195,11 +1203,9 @@ body {
             document.body.removeChild(modal);
         };
         buttonContainer.appendChild(okBtn);
-
         dialog.appendChild(buttonContainer);
         modal.appendChild(dialog);
         document.body.appendChild(modal);
-
         modal.onclick = () => {
             document.body.removeChild(modal);
         };

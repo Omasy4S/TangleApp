@@ -1,4 +1,3 @@
-// src/main/java/com/example/app/WidgetConfigActivity.kt
 package com.example.app
 
 import android.app.Activity
@@ -17,6 +16,7 @@ class WidgetConfigActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         appWidgetId = intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
@@ -28,11 +28,13 @@ class WidgetConfigActivity : Activity() {
         }
 
         setContentView(R.layout.widget_config_layout)
-        val projectsJson = getWidgetPrefs().getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
-        loadCountersFromJson(projectsJson)
+        loadCounters()
     }
 
-    private fun loadCountersFromJson(projectsJson: String) {
+    private fun loadCounters() {
+        val prefs = getWidgetPrefs()
+        val projectsJson = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
+
         runOnUiThread {
             val container = findViewById<LinearLayout>(R.id.config_container)
             container.removeAllViews()
@@ -83,6 +85,7 @@ class WidgetConfigActivity : Activity() {
         tv.text = "Создайте проект в приложении"
         tv.setTextColor(0xFF9E9E9E.toInt())
         tv.isEnabled = false
+        item.isClickable = false
         container.addView(item)
     }
 
@@ -91,6 +94,10 @@ class WidgetConfigActivity : Activity() {
             putString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", counterId)
             putString(PrefKeys.KNITTING_PROJECTS, projectsJson)
         }
+
+        // Обновляем виджет после конфигурации
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        KnittingCounterWidget.updateAppWidget(this, appWidgetManager, appWidgetId)
 
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         finish()
