@@ -33,6 +33,8 @@
         <activity
             android:name=".WidgetConfigActivity"
             android:exported="true"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
             android:theme="@style/Theme.Transparent">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

@@ -1,0 +1,144 @@
+<!-- Увеличено всё на ~40% -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="22dp"
+    android:background="@drawable/widget_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="14dp">
+
+        <TextView
+            android:id="@+id/widget_counter_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Счётчик"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#5D4A66"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <ImageButton
+            android:id="@+id/widget_btn_add_counter"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/widget_button_bg_round"
+            android:src="@drawable/ic_add_white_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Добавить счётчик" />
+
+    </LinearLayout>
+
+    <!-- Петли -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"
+        android:radius="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🧶 Петли"
+            android:textSize="16sp"
+            android:textColor="#5D4A66" />
+
+        <Button
+            android:id="@+id/widget_btn_stitch_dec"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:text="−"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/widget_button_bg"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/widget_stitch_value"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#5D4A66"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/widget_btn_stitch_inc"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:text="+"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/widget_button_bg"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+    </LinearLayout>
+
+    <!-- Ряды -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#FFFFFF"
+        android:padding="12dp"
+        android:radius="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📏 Ряды"
+            android:textSize="16sp"
+            android:textColor="#5D4A66" />
+
+        <Button
+            android:id="@+id/widget_btn_row_dec"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:text="−"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/widget_button_bg"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/widget_row_value"
+            android:layout_width="52dp"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#5D4A66"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/widget_btn_row_inc"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:text="+"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/widget_button_bg"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+    </LinearLayout>
+</LinearLayout>
