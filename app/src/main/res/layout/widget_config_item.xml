@@ -1,9 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="56dp"
     android:orientation="horizontal"
-    android:background="@drawable/widget_button_bg"
-    android:padding="12dp"
+    android:background="@drawable/widget_config_item_bg"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
     android:gravity="center_vertical"
     android:clickable="true"
     android:focusable="true"
@@ -14,16 +15,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textSize="14sp"
+        android:textSize="15sp"
         android:textColor="#5D4A66"
         android:ellipsize="end"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:fontFamily="sans-serif-medium" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="→"
-        android:textSize="16sp"
-        android:textColor="#5D4A66" />
+        android:textSize="18sp"
+        android:textColor="#A090A5" />
 
 </LinearLayout>

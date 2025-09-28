@@ -1,5 +1,7 @@
 package com.example.app
 
+import Counter
+import KnittingProject
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -7,7 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
-import org.json.JSONArray
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class KnittingCounterWidget : AppWidgetProvider() {
 
@@ -27,28 +30,24 @@ class KnittingCounterWidget : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle?
     ) {
-        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
         updateAppWidget(context, appWidgetManager, appWidgetId)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+        val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1)
+        if (appWidgetId == -1) return
+
         when (intent.action) {
             ACTION_UPDATE_STITCH, ACTION_UPDATE_ROW -> {
-                val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1)
                 val change = intent.getIntExtra(EXTRA_CHANGE, 0)
                 val isStitch = intent.action == ACTION_UPDATE_STITCH
-                if (appWidgetId != -1) {
-                    updateCounterValue(context, appWidgetId, isStitch, change)
-                    updateAppWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
-                }
+                updateCounterValue(context, appWidgetId, isStitch, change)
+                updateAppWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
             }
             ACTION_ADD_COUNTER -> {
-                val appWidgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1)
-                if (appWidgetId != -1) {
-                    addNewCounterToCurrentProject(context, appWidgetId)
-                    updateAppWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
-                }
+                addNewCounterToCurrentProject(context, appWidgetId)
+                updateAppWidget(context, AppWidgetManager.getInstance(context), appWidgetId)
             }
         }
     }
@@ -62,32 +61,21 @@ class KnittingCounterWidget : AppWidgetProvider() {
         val prefs = context.getWidgetPrefs()
         val counterId = prefs.getString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", "") ?: return
         if (counterId.isEmpty()) return
-        val projectsJson = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
-        try {
-            val projects = JSONArray(projectsJson)
-            val ids = counterId.split("-").map { it.toInt() }
-            if (ids.size != 2) return
-            val (projectIndex, counterIndex) = ids
-            if (projectIndex >= projects.length() || counterIndex < 0) return
-            val project = projects.getJSONObject(projectIndex)
-            val counters = project.getJSONArray("counters")
-            if (counterIndex >= counters.length()) return
-            val counter = counters.getJSONObject(counterIndex)
-            val key = if (isStitch) "stitches" else "rows"
-            val currentValue = counter.getInt(key)
-            val newValue = (currentValue + change).coerceAtLeast(0)
-            counter.put(key, newValue)
-            counters.put(counterIndex, counter)
-            project.put("counters", counters)
-            projects.put(projectIndex, project)
-            val updatedJson = projects.toString()
-            prefs.edit { putString(PrefKeys.KNITTING_PROJECTS, updatedJson) }
-            context.sendBroadcast(Intent(ACTION_WIDGET_UPDATE).apply {
-                putExtra("knittingProjects", updatedJson)
-            })
-        } catch (e: Exception) {
-            e.printStackTrace()
+
+        val projects = loadProjects(prefs) ?: return
+        val (projectIndex, counterIndex) = parseCounterId(counterId) ?: return
+
+        if (projectIndex !in projects.indices || counterIndex !in projects[projectIndex].counters.indices) return
+
+        val counter = projects[projectIndex].counters[counterIndex]
+        val newValue = if (isStitch) {
+            (counter.stitches + change).coerceAtLeast(0).also { counter.stitches = it }
+        } else {
+            (counter.rows + change).coerceAtLeast(0).also { counter.rows = it }
         }
+
+        saveProjects(prefs, projects)
+        notifyApp(context, projects)
     }
 
     private fun addNewCounterToCurrentProject(context: Context, appWidgetId: Int) {
@@ -95,43 +83,55 @@ class KnittingCounterWidget : AppWidgetProvider() {
         val counterId = prefs.getString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", "") ?: return
         if (counterId.isEmpty()) return
 
-        val projectsJson = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
-        try {
-            val projects = JSONArray(projectsJson)
-            val ids = counterId.split("-").map { it.toInt() }
-            if (ids.size != 2) return
-            val projectIndex = ids[0]
-            if (projectIndex >= projects.length()) return
+        val projects = loadProjects(prefs) ?: return
+        val (projectIndex, _) = parseCounterId(counterId) ?: return
 
-            val project = projects.getJSONObject(projectIndex)
-            val counters = project.getJSONArray("counters")
+        if (projectIndex !in projects.indices) return
 
-            // Создаём новый счётчик
-            val newCounter = org.json.JSONObject().apply {
-                put("name", "Новый счётчик")
-                put("stitches", 0)
-                put("rows", 0)
-            }
-            counters.put(newCounter)
-            val newCounterIndex = counters.length() - 1
+        val newCounter = Counter("Новый счётчик")
+        projects[projectIndex].counters.add(newCounter)
+        val newCounterIndex = projects[projectIndex].counters.lastIndex
+        val newCounterId = "$projectIndex-$newCounterIndex"
 
-            // Обновляем проект и привязку виджета
-            project.put("counters", counters)
-            projects.put(projectIndex, project)
+        prefs.edit {
+            putString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", newCounterId)
+            putString(PrefKeys.KNITTING_PROJECTS, Gson().toJson(projects))
+        }
 
-            val newCounterId = "$projectIndex-$newCounterIndex"
-            prefs.edit {
-                putString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", newCounterId)
-                putString(PrefKeys.KNITTING_PROJECTS, projects.toString())
-            }
+        notifyApp(context, projects)
+    }
 
-            // Уведомляем приложение (если оно запущено)
-            context.sendBroadcast(Intent(ACTION_WIDGET_UPDATE).apply {
-                putExtra("knittingProjects", projects.toString())
-            })
+    // === Вспомогательные функции ===
 
+    private fun loadProjects(prefs: android.content.SharedPreferences): MutableList<KnittingProject>? {
+        return try {
+            val json = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
+            val type = object : TypeToken<MutableList<KnittingProject>>() {}.type
+            Gson().fromJson<MutableList<KnittingProject>>(json, type) ?: mutableListOf()
         } catch (e: Exception) {
             e.printStackTrace()
+            null
+        }
+    }
+
+    private fun saveProjects(prefs: android.content.SharedPreferences, projects: List<KnittingProject>) {
+        prefs.edit {
+            putString(PrefKeys.KNITTING_PROJECTS, Gson().toJson(projects))
+        }
+    }
+
+    private fun notifyApp(context: Context, projects: List<KnittingProject>) {
+        context.sendBroadcast(Intent(ACTION_WIDGET_UPDATE).apply {
+            putExtra("knittingProjects", Gson().toJson(projects))
+        })
+    }
+
+    private fun parseCounterId(id: String): Pair<Int, Int>? {
+        return try {
+            val parts = id.split("-")
+            if (parts.size == 2) Pair(parts[0].toInt(), parts[1].toInt()) else null
+        } catch (e: NumberFormatException) {
+            null
         }
     }
 
@@ -151,30 +151,31 @@ class KnittingCounterWidget : AppWidgetProvider() {
             appWidgetIds.forEach { appWidgetId ->
                 val prefs = context.getWidgetPrefs()
                 val counterId = prefs.getString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", "") ?: ""
+
                 var counterName = "Счётчик"
                 var stitches = 0
                 var rows = 0
 
                 if (counterId.isNotEmpty()) {
-                    val projectsJson = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
-                    try {
-                        val projects = JSONArray(projectsJson)
-                        val ids = counterId.split("-").map { it.toInt() }
-                        if (ids.size == 2) {
-                            val (projectIndex, counterIndex) = ids
-                            if (projectIndex < projects.length() && counterIndex >= 0) {
-                                val project = projects.getJSONObject(projectIndex)
-                                val counters = project.getJSONArray("counters")
-                                if (counterIndex < counters.length()) {
-                                    val counter = counters.getJSONObject(counterIndex)
-                                    counterName = "${project.getString("name")}: ${counter.getString("name")}"
-                                    stitches = counter.getInt("stitches")
-                                    rows = counter.getInt("rows")
-                                }
-                            }
-                        }
+                    val projects = try {
+                        val json = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
+                        val type = object : TypeToken<List<KnittingProject>>() {}.type
+                        Gson().fromJson<List<KnittingProject>>(json, type)
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        null
+                    }
+
+                    val (projectIndex, counterIndex) = runCatching {
+                        val parts = counterId.split("-")
+                        Pair(parts[0].toInt(), parts[1].toInt())
+                    }.getOrNull() ?: Pair(-1, -1)
+
+                    if (projects != null && projectIndex in projects.indices && counterIndex in projects[projectIndex].counters.indices) {
+                        val project = projects[projectIndex]
+                        val counter = project.counters[counterIndex]
+                        counterName = "${project.name}: ${counter.name}"
+                        stitches = counter.stitches
+                        rows = counter.rows
                     }
                 }
 
@@ -194,7 +195,7 @@ class KnittingCounterWidget : AppWidgetProvider() {
                 views.setTextViewText(R.id.widget_stitch_value, stitches.toString())
                 views.setTextViewText(R.id.widget_row_value, rows.toString())
 
-                // === Клик по названию: выбор счётчика ===
+                // === PendingIntent: выбор счётчика ===
                 val configIntent = Intent(context, WidgetConfigActivity::class.java).apply {
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -207,7 +208,7 @@ class KnittingCounterWidget : AppWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widget_counter_name, configPendingIntent)
 
-                // === Клик по плюсику: добавить счётчик ===
+                // === PendingIntent: добавить счётчик ===
                 val addCounterIntent = Intent(context, KnittingCounterWidget::class.java).apply {
                     action = ACTION_ADD_COUNTER
                     putExtra(EXTRA_WIDGET_ID, appWidgetId)
@@ -220,9 +221,10 @@ class KnittingCounterWidget : AppWidgetProvider() {
                 )
                 views.setOnClickPendingIntent(R.id.widget_btn_add_counter, addCounterPendingIntent)
 
-                // === Кнопки изменения значений ===
-                fun createPendingIntent(action: String, change: Int, requestCode: Int): PendingIntent {
+                // === Кнопки изменения ===
+                fun createPendingIntent(actionName: String, change: Int, requestCode: Int): PendingIntent {
                     val intent = Intent(context, KnittingCounterWidget::class.java).apply {
+                        action = actionName
                         putExtra(EXTRA_WIDGET_ID, appWidgetId)
                         putExtra(EXTRA_CHANGE, change)
                     }

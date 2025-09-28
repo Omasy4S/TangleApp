@@ -1,18 +1,23 @@
 package com.example.app
 
+import KnittingProject
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import org.json.JSONArray
+import androidx.core.view.isVisible
+import com.example.app.databinding.WidgetConfigItemBinding
+import com.example.app.databinding.WidgetConfigLayoutBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class WidgetConfigActivity : Activity() {
+
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+    private lateinit var binding: WidgetConfigLayoutBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,78 +32,79 @@ class WidgetConfigActivity : Activity() {
             return
         }
 
-        setContentView(R.layout.widget_config_layout)
-        loadCounters()
+        binding = WidgetConfigLayoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        loadAndDisplayCounters()
     }
 
-    private fun loadCounters() {
+    private fun loadAndDisplayCounters() {
         val prefs = getWidgetPrefs()
-        val projectsJson = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
+        val container = binding.configContainer
+        container.removeAllViews()
 
-        runOnUiThread {
-            val container = findViewById<LinearLayout>(R.id.config_container)
-            container.removeAllViews()
+        val projects = try {
+            val json = prefs.getString(PrefKeys.KNITTING_PROJECTS, "[]") ?: "[]"
+            val type = object : TypeToken<List<KnittingProject>>() {}.type
+            Gson().fromJson<List<KnittingProject>>(json, type) ?: emptyList()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Ошибка загрузки проектов", Toast.LENGTH_SHORT).show()
+            emptyList()
+        }
 
-            if (projectsJson == "[]" || projectsJson.isBlank()) {
-                showEmptyMessage(container)
-                return@runOnUiThread
-            }
+        if (projects.isEmpty() || projects.all { it.counters.isEmpty() }) {
+            showEmptyMessage(container)
+            return
+        }
 
-            try {
-                val projects = JSONArray(projectsJson)
-                var hasCounters = false
+        var hasCounters = false
+        for ((projectIndex, project) in projects.withIndex()) {
+            for ((counterIndex, counter) in project.counters.withIndex()) {
+                hasCounters = true
+                val fullCounterName = "${project.name}: ${counter.name}"
+                val counterId = "$projectIndex-$counterIndex"
 
-                for (i in 0 until projects.length()) {
-                    val project = projects.getJSONObject(i)
-                    val counters = project.getJSONArray("counters")
+                val itemBinding = WidgetConfigItemBinding.inflate(layoutInflater, container, false)
+                itemBinding.counterName.text = fullCounterName
 
-                    for (j in 0 until counters.length()) {
-                        hasCounters = true
-                        val counter = counters.getJSONObject(j)
-                        val fullCounterName = "${project.getString("name")}: ${counter.getString("name")}"
-                        val counterId = "$i-$j"
-
-                        val item = LayoutInflater.from(this)
-                            .inflate(R.layout.widget_config_item, container, false) as LinearLayout
-                        item.findViewById<TextView>(R.id.counter_name).text = fullCounterName
-
-                        item.setOnClickListener {
-                            saveSelection(counterId, projectsJson)
-                        }
-                        container.addView(item)
-                    }
+                itemBinding.root.setOnClickListener {
+                    saveSelection(counterId)
+                    finishWithResult()
                 }
 
-                if (!hasCounters) showEmptyMessage(container)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
-                showEmptyMessage(container)
+                container.addView(itemBinding.root)
             }
+        }
+
+        if (!hasCounters) {
+            showEmptyMessage(container)
         }
     }
 
     private fun showEmptyMessage(container: LinearLayout) {
-        val item = LayoutInflater.from(this)
-            .inflate(R.layout.widget_config_item, container, false) as LinearLayout
-        val tv = item.findViewById<TextView>(R.id.counter_name)
-        tv.text = "Создайте проект в приложении"
-        tv.setTextColor(0xFF9E9E9E.toInt())
-        tv.isEnabled = false
-        item.isClickable = false
-        container.addView(item)
+        val itemBinding = WidgetConfigItemBinding.inflate(layoutInflater, container, false)
+        with(itemBinding.counterName) {
+            text = "Создайте проект в приложении"
+            setTextColor(0xFF9E9E9E.toInt())
+            isEnabled = false
+        }
+        itemBinding.root.isClickable = false
+        itemBinding.root.alpha = 0.6f
+        container.addView(itemBinding.root)
     }
 
-    private fun saveSelection(counterId: String, projectsJson: String) {
+    private fun saveSelection(counterId: String) {
         getWidgetPrefs().edit {
             putString("${PrefKeys.WIDGET_COUNTER_ID_PREFIX}$appWidgetId", counterId)
-            putString(PrefKeys.KNITTING_PROJECTS, projectsJson)
         }
+        // Обновляем виджет
+        AppWidgetManager.getInstance(this).also { appWidgetManager ->
+            KnittingCounterWidget.updateAppWidget(this, appWidgetManager, appWidgetId)
+        }
+    }
 
-        // Обновляем виджет после конфигурации
-        val appWidgetManager = AppWidgetManager.getInstance(this)
-        KnittingCounterWidget.updateAppWidget(this, appWidgetManager, appWidgetId)
-
+    private fun finishWithResult() {
         setResult(RESULT_OK, Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId))
         finish()
     }

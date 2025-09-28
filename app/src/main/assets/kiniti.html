@@ -20,7 +20,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent; /* ✅ Убирает синий квадрат при нажатии */
+            -webkit-tap-highlight-color: transparent;
         }
         body {
             background: var(--light);
@@ -133,7 +133,7 @@
             line-height: 1.3;
         }
         .add-project {
-            background: #FEF7F9; /* Новый цвет фона */
+            background: #FEF7F9;
             color: var(--dark);
         }
         .add-project .project-icon {
@@ -443,8 +443,8 @@
         /* Калькулятор */
         #calculator {
             padding: 0 8px;
-            overflow-y: auto; /* Разрешаем вертикальный скролл, если контент не помещается */
-            max-height: calc(100vh - 120px); /* Ограничиваем высоту, чтобы не перекрывалась навигация */
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
         }
         .calculator-grid {
             display: grid;
@@ -590,7 +590,6 @@
                 font-size: 0.85rem;
                 padding: 6px;
             }
-            /* Калькулятор: убираем боковые отступы, если они есть */
             #calculator {
                 padding: 0;
             }
@@ -680,10 +679,9 @@
         <input type="file" id="imageInput" accept="image/*,.pdf" style="display: none;" onchange="addImage(this)">
         <button class="upload-btn" onclick="document.getElementById('imageInput').click()">Загрузить новую схему</button>
     </div>
-    <!-- ✅ ИЗМЕНЕНО: Расчёт — пошаговый -->
+    <!-- Расчёт — пошаговый -->
     <div id="calculator" class="section">
         <h2>Калькулятор петель и рядов</h2>
-        <!-- Шаг 1: Текущие параметры -->
         <div id="step1" class="calc-step">
             <div class="calc-group">
                 <div class="calc-title">Текущие параметры</div>
@@ -706,7 +704,6 @@
             </div>
             <button class="calc-btn" onclick="nextStep()">Далее</button>
         </div>
-        <!-- Шаг 2: Желаемые параметры -->
         <div id="step2" class="calc-step" style="display: none;">
             <div class="calc-group">
                 <div class="calc-title">Желаемые параметры</div>
@@ -721,7 +718,6 @@
             </div>
             <button class="calc-btn" onclick="calculate()">Рассчитать</button>
         </div>
-        <!-- Шаг 3: Результат -->
         <div id="step3" class="calc-step" style="display: none;">
             <div class="calc-result" id="calcResult">
                 <!-- Результат появится здесь -->
@@ -758,15 +754,29 @@
 </div>
 <script>
     // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
-    // Хранит все проекты, синхронизируется с localStorage и Android
     window.projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
-    // Хранит схемы (изображения и PDF), синхронизируется с localStorage
-    // Теперь это массив объектов: { type: 'image' | 'pdf', url: string, name?: string }
     let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
-    // Индекс текущего открытого проекта (-1 если ни один не открыт)
     let currentProjectIndex = -1;
-    // Флаг: открыто ли модальное окно проекта
     window.isProjectModalOpen = false;
+
+    // === НОВАЯ: Безопасное обновление из Android ===
+    window.updateProjectsFromAndroid = function(jsonString) {
+        try {
+            const parsed = JSON.parse(jsonString);
+            if (Array.isArray(parsed)) {
+                window.projects = parsed;
+                localStorage.setItem('knittingProjects', jsonString);
+                renderProjects();
+                if (window.isProjectModalOpen && typeof window.renderCounters === 'function') {
+                    window.renderCounters();
+                }
+            } else {
+                console.warn('Received non-array data from Android:', jsonString);
+            }
+        } catch (e) {
+            console.error('Failed to parse projects from Android:', e, jsonString);
+        }
+    };
 
     // === ИНИЦИАЛИЗАЦИЯ ===
     document.addEventListener('DOMContentLoaded', function() {
@@ -787,7 +797,6 @@
     function renderProjects() {
         const grid = document.getElementById('projectsGrid');
         grid.innerHTML = '';
-        // Добавляем кнопку "Создать новый проект"
         const addProjectWrapper = document.createElement('div');
         addProjectWrapper.className = 'project-wrapper';
         addProjectWrapper.innerHTML = `
@@ -798,7 +807,6 @@
         addProjectWrapper.querySelector('.project-card').onclick = createNewProject;
         grid.appendChild(addProjectWrapper);
 
-        // Рендерим существующие проекты
         projects.forEach((project, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'project-wrapper';
@@ -852,19 +860,13 @@
         renderProjects();
     }
 
-    // === РЕНДЕР СЧЁТЧИКОВ (публичная функция для MainActivity) ===
+    // === РЕНДЕР СЧЁТЧИКОВ ===
     window.renderCounters = function() {
-        console.log("renderCounters вызвана.");
         const list = document.getElementById('countersList');
-        if (!list) {
-             console.error("Элемент #countersList не найден.");
-             return;
+        if (!list || currentProjectIndex < 0 || currentProjectIndex >= projects.length) {
+            return;
         }
         list.innerHTML = '';
-        if (currentProjectIndex === -1 || currentProjectIndex >= projects.length) {
-             console.warn("currentProjectIndex некорректен:", currentProjectIndex);
-             return;
-        }
         const project = projects[currentProjectIndex];
         project.counters.forEach((counter, idx) => {
             const counterDiv = document.createElement('div');
@@ -899,8 +901,22 @@
             `;
             list.appendChild(counterDiv);
         });
+    };
+
+    // === ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений, кроме escapeHtml) ===
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "<")
+            .replace(/>/g, ">")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
+    // ... остальной JS-код (addCounter, saveProjects, renderSchemes, калькулятор и т.д.) остаётся **без изменений**
+
+    // Ниже — весь остальной JS из оригинала (для полноты)
     function addCounter() {
         if (currentProjectIndex === -1) return;
         const newCounter = { name: 'Новый счётчик', stitches: 0, rows: 0 };
@@ -908,14 +924,12 @@
         saveProjects();
         renderCounters();
     }
-
     function updateCounterName(index, value) {
         if (value.trim()) {
             projects[currentProjectIndex].counters[index].name = value.trim();
             saveProjects();
         }
     }
-
     function removeCounter(index) {
         if (confirm('Удалить этот счётчик?')) {
             projects[currentProjectIndex].counters.splice(index, 1);
@@ -930,14 +944,11 @@
             renderCounters();
         }
     }
-
-    // === ФУНКЦИИ СЧЁТЧИКОВ (Петли/Ряды) ===
     function incrementStitch(index) {
         projects[currentProjectIndex].counters[index].stitches++;
         document.getElementById(`stitch-${index}`).textContent = projects[currentProjectIndex].counters[index].stitches;
         saveProjects();
     }
-
     function decrementStitch(index) {
         if (projects[currentProjectIndex].counters[index].stitches > 0) {
             projects[currentProjectIndex].counters[index].stitches--;
@@ -945,13 +956,11 @@
             saveProjects();
         }
     }
-
     function incrementRow(index) {
         projects[currentProjectIndex].counters[index].rows++;
         document.getElementById(`row-${index}`).textContent = projects[currentProjectIndex].counters[index].rows;
         saveProjects();
     }
-
     function decrementRow(index) {
         if (projects[currentProjectIndex].counters[index].rows > 0) {
             projects[currentProjectIndex].counters[index].rows--;
@@ -959,7 +968,6 @@
             saveProjects();
         }
     }
-
     function editStitch(index) {
         showCustomPrompt('Введите новое количество петель:', projects[currentProjectIndex].counters[index].stitches, (value) => {
             const num = parseInt(value);
@@ -972,7 +980,6 @@
             }
         });
     }
-
     function editRow(index) {
         showCustomPrompt('Введите новое количество рядов:', projects[currentProjectIndex].counters[index].rows, (value) => {
             const num = parseInt(value);
@@ -985,8 +992,6 @@
             }
         });
     }
-
-    // === УДАЛЕНИЕ ПРОЕКТА ===
     function deleteProject() {
         if (currentProjectIndex === -1 || currentProjectIndex >= projects.length) return;
         if (confirm('Ты уверена, что хочешь удалить этот проект? Все данные будут потеряны.')) {
@@ -997,7 +1002,6 @@
             closeModal();
         }
     }
-
     function deleteProjectCard(index, event) {
         event.stopPropagation();
         if (confirm('Удалить этот проект?')) {
@@ -1006,8 +1010,6 @@
             renderProjects();
         }
     }
-
-    // === СОХРАНЕНИЕ ПРОЕКТОВ (в localStorage и на Android) ===
     function saveProjects() {
         const json = JSON.stringify(projects);
         localStorage.setItem('knittingProjects', json);
@@ -1015,8 +1017,6 @@
             Android.saveProjects(json);
         }
     }
-
-    // === РЕНДЕР СХЕМ (изображения и PDF) ===
     function renderSchemes() {
         const grid = document.getElementById('galleryGrid');
         grid.innerHTML = '';
@@ -1031,9 +1031,7 @@
             item.style.justifyContent = 'center';
             item.style.textAlign = 'center';
             item.style.padding = '8px';
-
             if (scheme.type === 'pdf') {
-                // Рендер PDF как иконку 📄
                 item.innerHTML = `
                     <div style="font-size: 2.5rem; margin-bottom: 8px;">📄</div>
                     <div style="font-size: 0.75rem; word-break: break-word;">${escapeHtml(scheme.name)}</div>
@@ -1047,7 +1045,6 @@
                     }
                 };
             } else {
-                // Рендер изображения как раньше
                 item.innerHTML = `
                     <img src="${scheme.url}" alt="Схема ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
                     <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
@@ -1057,13 +1054,10 @@
             grid.appendChild(item);
         });
     }
-
-    // === ДОБАВЛЕНИЕ СХЕМЫ (изображение или PDF) ===
     function addImage(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
             if (file.type === 'application/pdf') {
-                // Создаём временный URL для PDF
                 const url = URL.createObjectURL(file);
                 schemes.push({ type: 'pdf', url: url, name: file.name });
                 saveSchemes();
@@ -1081,24 +1075,18 @@
             }
         }
     }
-
-    // === МОДАЛЬНОЕ ОКНО ИЗОБРАЖЕНИЯ ===
     function openImageModal(imageUrl) {
         document.getElementById('modalImage').src = imageUrl;
         document.getElementById('imageModal').style.display = 'flex';
     }
-
     function closeImageModal() {
         document.getElementById('imageModal').style.display = 'none';
     }
-
-    // === УДАЛЕНИЕ СХЕМЫ ===
     function deleteScheme(index, event) {
         event.stopPropagation();
         if (confirm('Удалить эту схему?')) {
             const scheme = schemes[index];
             if (scheme.type === 'pdf') {
-                // Освобождаем URL объекта
                 URL.revokeObjectURL(scheme.url);
             }
             schemes.splice(index, 1);
@@ -1106,13 +1094,9 @@
             renderSchemes();
         }
     }
-
-    // === СОХРАНЕНИЕ СХЕМ (в localStorage) ===
     function saveSchemes() {
         localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
     }
-
-    // === КАЛЬКУЛЯТОР (остаётся без изменений) ===
     function nextStep() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
         const currentLength = parseFloat(document.getElementById('currentLength').value);
@@ -1126,7 +1110,6 @@
         document.getElementById('step1').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
     }
-
     function calculate() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
         const currentLength = parseFloat(document.getElementById('currentLength').value);
@@ -1149,12 +1132,10 @@
         document.getElementById('step2').style.display = 'none';
         document.getElementById('step3').style.display = 'block';
     }
-
     function backToStep2() {
         document.getElementById('step3').style.display = 'none';
         document.getElementById('step2').style.display = 'block';
     }
-
     function resetCalculator() {
         document.getElementById('currentWidth').value = '';
         document.getElementById('currentLength').value = '';
@@ -1167,14 +1148,6 @@
         document.getElementById('step2').style.display = 'none';
         document.getElementById('step1').style.display = 'block';
     }
-
-    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
     function showCustomPrompt(title, defaultValue, callback) {
         const modal = document.createElement('div');
         modal.style.position = 'fixed';
