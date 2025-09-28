@@ -30,6 +30,7 @@
             background-image: radial-gradient(circle at 25% 25%, rgba(252, 217, 184, 0.2) 0%, transparent 50%),
                               radial-gradient(circle at 75% 75%, rgba(248, 205, 202, 0.2) 0%, transparent 50%);
             background-attachment: fixed;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         .container {
             max-width: 1000px;
@@ -533,95 +534,86 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-/* Универсальная адаптация под все современные телефоны */
-/* Используем не только ширину, но и безопасные зоны */
-/* Основной body: добавляем отступы для безопасных зон */
-body {
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    /* ... остальные ваши стили для body ... */
-}
-/* Адаптация для компактных экранов (до 768px) */
-@media (max-width: 768px) {
-    body {
-        padding: calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 8px);
-    }
-    h1 {
-        font-size: 1.8rem;
-        line-height: 1.2;
-    }
-    .subtitle {
-        font-size: 0.95rem;
-    }
-    .nav-btn {
-        min-width: 80px;
-        padding: 8px 12px;
-        font-size: 0.9rem;
-        flex: 1 1 100px;
-    }
-    .projects-grid {
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-        gap: 12px;
-    }
-    .project-icon {
-        font-size: 1.8rem;
-    }
-    .project-name {
-        font-size: 0.9rem;
-    }
-    .modal-content {
-        padding: 20px 16px;
-        max-width: 95vw;
-        max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);
-    }
-    .modal-title {
-        font-size: 1.3rem;
-    }
-    .edit-title {
-        font-size: 1.3rem;
-    }
-    .counter-value {
-        font-size: 1.2rem;
-        min-width: 45px;
-    }
-    .counter-header .counter-btn {
-        background: #e07a5f;
-        width: 30px;
-        height: 30px;
-        font-size: 0.9rem;
-    }
-    .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 12px;
-    }
-    .gallery-item {
-        font-size: 0.85rem;
-        padding: 6px;
-    }
-    /* Калькулятор: убираем боковые отступы, если они есть */
-    #calculator {
-        padding: 0;
-    }
-    .calc-group {
-        padding: 16px 12px;
-    }
-}
-/* Для очень маленьких экранов или в ландшафтном режиме */
-@media (max-width: 480px) and (max-height: 480px) {
-    .projects-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-        gap: 8px;
-    }
-    .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 8px;
-    }
-    .counter-controls {
-        gap: 8px;
-    }
-    .control-group {
-        padding: 6px 8px;
-    }
-}
+        @media (max-width: 768px) {
+            body {
+                padding: calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 16px) calc(env(safe-area-inset-left) + 8px);
+            }
+            h1 {
+                font-size: 1.8rem;
+                line-height: 1.2;
+            }
+            .subtitle {
+                font-size: 0.95rem;
+            }
+            .nav-btn {
+                min-width: 80px;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+                flex: 1 1 100px;
+            }
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 12px;
+            }
+            .project-icon {
+                font-size: 1.8rem;
+            }
+            .project-name {
+                font-size: 0.9rem;
+            }
+            .modal-content {
+                padding: 20px 16px;
+                max-width: 95vw;
+                max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 40px);
+            }
+            .modal-title {
+                font-size: 1.3rem;
+            }
+            .edit-title {
+                font-size: 1.3rem;
+            }
+            .counter-value {
+                font-size: 1.2rem;
+                min-width: 45px;
+            }
+            .counter-header .counter-btn {
+                background: #e07a5f;
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            .gallery-item {
+                font-size: 0.85rem;
+                padding: 6px;
+            }
+            /* Калькулятор: убираем боковые отступы, если они есть */
+            #calculator {
+                padding: 0;
+            }
+            .calc-group {
+                padding: 16px 12px;
+            }
+        }
+        @media (max-width: 480px) and (max-height: 480px) {
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 8px;
+            }
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 8px;
+            }
+            .counter-controls {
+                gap: 8px;
+            }
+            .control-group {
+                padding: 6px 8px;
+            }
+        }
         @media (min-width: 769px) {
             .calculator-grid { grid-template-columns: 1fr 1fr; }
         }
@@ -685,7 +677,7 @@ body {
         <div class="gallery-grid" id="galleryGrid">
             <!-- Схемы будут рендериться сюда -->
         </div>
-        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="addImage(this)">
+        <input type="file" id="imageInput" accept="image/*,.pdf" style="display: none;" onchange="addImage(this)">
         <button class="upload-btn" onclick="document.getElementById('imageInput').click()">Загрузить новую схему</button>
     </div>
     <!-- ✅ ИЗМЕНЕНО: Расчёт — пошаговый -->
@@ -765,22 +757,25 @@ body {
     </div>
 </div>
 <script>
-    // ✅ ИЗМЕНЕНО: Объявляем projects как window.projects, чтобы MainActivity могла обновить переменную
+    // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
+    // Хранит все проекты, синхронизируется с localStorage и Android
     window.projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
+    // Хранит схемы (изображения и PDF), синхронизируется с localStorage
+    // Теперь это массив объектов: { type: 'image' | 'pdf', url: string, name?: string }
+    let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
     // Индекс текущего открытого проекта (-1 если ни один не открыт)
     let currentProjectIndex = -1;
-    // Схемы
-    let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
-
-    // ✅ Добавлено: флаг открытого модального окна, доступный для MainActivity
+    // Флаг: открыто ли модальное окно проекта
     window.isProjectModalOpen = false;
 
+    // === ИНИЦИАЛИЗАЦИЯ ===
     document.addEventListener('DOMContentLoaded', function() {
         renderProjects();
         renderSchemes();
         showSection('projects');
     });
 
+    // === НАВИГАЦИЯ ===
     function showSection(sectionId) {
         document.querySelectorAll('.section').forEach(section => {
             section.style.display = 'none';
@@ -788,9 +783,11 @@ body {
         document.getElementById(sectionId).style.display = 'block';
     }
 
+    // === РЕНДЕР ПРОЕКТОВ ===
     function renderProjects() {
         const grid = document.getElementById('projectsGrid');
         grid.innerHTML = '';
+        // Добавляем кнопку "Создать новый проект"
         const addProjectWrapper = document.createElement('div');
         addProjectWrapper.className = 'project-wrapper';
         addProjectWrapper.innerHTML = `
@@ -800,6 +797,8 @@ body {
         `;
         addProjectWrapper.querySelector('.project-card').onclick = createNewProject;
         grid.appendChild(addProjectWrapper);
+
+        // Рендерим существующие проекты
         projects.forEach((project, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'project-wrapper';
@@ -833,7 +832,7 @@ body {
         document.getElementById('projectTitleInput').value = project.name;
         renderCounters();
         document.getElementById('projectModal').style.display = 'flex';
-        window.isProjectModalOpen = true; // ✅ Установка флага при открытии
+        window.isProjectModalOpen = true;
     }
 
     function closeModal() {
@@ -849,11 +848,11 @@ body {
             currentProjectIndex = -1;
         }
         document.getElementById('projectModal').style.display = 'none';
-        window.isProjectModalOpen = false; // ✅ Сброс флага при закрытии
+        window.isProjectModalOpen = false;
         renderProjects();
     }
 
-    // ✅ Функция обновления интерфейса счётчиков, теперь объявлена как window.renderCounters
+    // === РЕНДЕР СЧЁТЧИКОВ (публичная функция для MainActivity) ===
     window.renderCounters = function() {
         console.log("renderCounters вызвана.");
         const list = document.getElementById('countersList');
@@ -932,6 +931,7 @@ body {
         }
     }
 
+    // === ФУНКЦИИ СЧЁТЧИКОВ (Петли/Ряды) ===
     function incrementStitch(index) {
         projects[currentProjectIndex].counters[index].stitches++;
         document.getElementById(`stitch-${index}`).textContent = projects[currentProjectIndex].counters[index].stitches;
@@ -986,6 +986,7 @@ body {
         });
     }
 
+    // === УДАЛЕНИЕ ПРОЕКТА ===
     function deleteProject() {
         if (currentProjectIndex === -1 || currentProjectIndex >= projects.length) return;
         if (confirm('Ты уверена, что хочешь удалить этот проект? Все данные будут потеряны.')) {
@@ -1006,6 +1007,7 @@ body {
         }
     }
 
+    // === СОХРАНЕНИЕ ПРОЕКТОВ (в localStorage и на Android) ===
     function saveProjects() {
         const json = JSON.stringify(projects);
         localStorage.setItem('knittingProjects', json);
@@ -1014,7 +1016,7 @@ body {
         }
     }
 
-    // Функции для схем (остаются без изменений)
+    // === РЕНДЕР СХЕМ (изображения и PDF) ===
     function renderSchemes() {
         const grid = document.getElementById('galleryGrid');
         grid.innerHTML = '';
@@ -1023,28 +1025,64 @@ body {
             item.className = 'gallery-item';
             item.style.cursor = 'pointer';
             item.style.position = 'relative';
-            item.innerHTML = `
-                <img src="${scheme}" alt="Схема ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
-                <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
-            `;
-            item.querySelector('img').onclick = () => openImageModal(scheme);
+            item.style.display = 'flex';
+            item.style.flexDirection = 'column';
+            item.style.alignItems = 'center';
+            item.style.justifyContent = 'center';
+            item.style.textAlign = 'center';
+            item.style.padding = '8px';
+
+            if (scheme.type === 'pdf') {
+                // Рендер PDF как иконку 📄
+                item.innerHTML = `
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">📄</div>
+                    <div style="font-size: 0.75rem; word-break: break-word;">${escapeHtml(scheme.name)}</div>
+                    <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
+                `;
+                item.onclick = () => {
+                    if (typeof Android !== 'undefined' && Android.openPdf) {
+                        Android.openPdf(scheme.url);
+                    } else {
+                        alert('PDF можно открыть только в мобильном приложении.');
+                    }
+                };
+            } else {
+                // Рендер изображения как раньше
+                item.innerHTML = `
+                    <img src="${scheme.url}" alt="Схема ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                    <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
+                `;
+                item.querySelector('img').onclick = () => openImageModal(scheme.url);
+            }
             grid.appendChild(item);
         });
     }
 
+    // === ДОБАВЛЕНИЕ СХЕМЫ (изображение или PDF) ===
     function addImage(input) {
         if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const newSchemeUrl = e.target.result;
-                schemes.push(newSchemeUrl);
+            const file = input.files[0];
+            if (file.type === 'application/pdf') {
+                // Создаём временный URL для PDF
+                const url = URL.createObjectURL(file);
+                schemes.push({ type: 'pdf', url: url, name: file.name });
                 saveSchemes();
                 renderSchemes();
+            } else if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    schemes.push({ type: 'image', url: e.target.result });
+                    saveSchemes();
+                    renderSchemes();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Поддерживаются только изображения и PDF-файлы.');
             }
-            reader.readAsDataURL(input.files[0]);
         }
     }
 
+    // === МОДАЛЬНОЕ ОКНО ИЗОБРАЖЕНИЯ ===
     function openImageModal(imageUrl) {
         document.getElementById('modalImage').src = imageUrl;
         document.getElementById('imageModal').style.display = 'flex';
@@ -1054,20 +1092,27 @@ body {
         document.getElementById('imageModal').style.display = 'none';
     }
 
+    // === УДАЛЕНИЕ СХЕМЫ ===
     function deleteScheme(index, event) {
         event.stopPropagation();
         if (confirm('Удалить эту схему?')) {
+            const scheme = schemes[index];
+            if (scheme.type === 'pdf') {
+                // Освобождаем URL объекта
+                URL.revokeObjectURL(scheme.url);
+            }
             schemes.splice(index, 1);
             saveSchemes();
             renderSchemes();
         }
     }
 
+    // === СОХРАНЕНИЕ СХЕМ (в localStorage) ===
     function saveSchemes() {
         localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
     }
 
-    // Калькулятор (остаётся без изменений)
+    // === КАЛЬКУЛЯТОР (остаётся без изменений) ===
     function nextStep() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
         const currentLength = parseFloat(document.getElementById('currentLength').value);
@@ -1123,6 +1168,7 @@ body {
         document.getElementById('step1').style.display = 'block';
     }
 
+    // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
