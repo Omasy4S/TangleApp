@@ -5,14 +5,12 @@
     android:orientation="vertical"
     android:padding="12dp"
     android:background="@drawable/widget_background">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginBottom="8dp">
-
         <TextView
             android:id="@+id/widget_counter_name"
             android:layout_width="0dp"
@@ -25,7 +23,6 @@
             android:gravity="center"
             android:ellipsize="end"
             android:maxLines="1" />
-
         <ImageButton
             android:id="@+id/widget_btn_add_counter"
             android:layout_width="24dp"
@@ -34,9 +31,7 @@
             android:src="@drawable/ic_add_white_24dp"
             android:scaleType="centerInside"
             android:contentDescription="Добавить счётчик" />
-
     </LinearLayout>
-
     <!-- Петли -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,7 +42,6 @@
         android:padding="6dp"
         android:layout_marginBottom="6dp"
         android:radius="8dp">
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -56,18 +50,15 @@
             android:textSize="12sp"
             android:textColor="#5D4A66"
             android:gravity="center_vertical" />
-
-        <Button
+        <!-- Кнопка "-" -->
+        <ImageButton
             android:id="@+id/widget_btn_stitch_dec"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:text="−"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/widget_button_bg"
-            android:layout_marginStart="4dp" />
-
+            android:background="@drawable/widget_button_bg_round"
+            android:src="@drawable/ic_minus_white_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Уменьшить петли" />
         <TextView
             android:id="@+id/widget_stitch_value"
             android:layout_width="36dp"
@@ -77,20 +68,16 @@
             android:textStyle="bold"
             android:textColor="#5D4A66"
             android:gravity="center" />
-
-        <Button
+        <!-- Кнопка "+" -->
+        <ImageButton
             android:id="@+id/widget_btn_stitch_inc"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:text="+"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/widget_button_bg"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp" />
+            android:background="@drawable/widget_button_bg_round"
+            android:src="@drawable/ic_plus_white_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Увеличить петли" />
     </LinearLayout>
-
     <!-- Ряды -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -100,7 +87,6 @@
         android:background="#FFFFFF"
         android:padding="6dp"
         android:radius="8dp">
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -109,18 +95,15 @@
             android:textSize="12sp"
             android:textColor="#5D4A66"
             android:gravity="center_vertical" />
-
-        <Button
+        <!-- Кнопка "-" -->
+        <ImageButton
             android:id="@+id/widget_btn_row_dec"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:text="−"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/widget_button_bg"
-            android:layout_marginStart="4dp" />
-
+            android:background="@drawable/widget_button_bg_round"
+            android:src="@drawable/ic_minus_white_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Уменьшить ряды" />
         <TextView
             android:id="@+id/widget_row_value"
             android:layout_width="36dp"
@@ -130,18 +113,14 @@
             android:textStyle="bold"
             android:textColor="#5D4A66"
             android:gravity="center" />
-
-        <Button
+        <!-- Кнопка "+" -->
+        <ImageButton
             android:id="@+id/widget_btn_row_inc"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:text="+"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/widget_button_bg"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp" />
+            android:background="@drawable/widget_button_bg_round"
+            android:src="@drawable/ic_plus_white_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Увеличить ряды" />
     </LinearLayout>
-
 </LinearLayout>

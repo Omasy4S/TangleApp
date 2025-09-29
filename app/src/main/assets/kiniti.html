@@ -1058,10 +1058,15 @@
         if (input.files && input.files[0]) {
             const file = input.files[0];
             if (file.type === 'application/pdf') {
-                const url = URL.createObjectURL(file);
-                schemes.push({ type: 'pdf', url: url, name: file.name });
-                saveSchemes();
-                renderSchemes();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Сохраняем data: URL и имя файла
+                    schemes.push({ type: 'pdf', url: e.target.result, name: file.name });
+                    saveSchemes();
+                    renderSchemes();
+                };
+                // Читаем файл как Data URL (base64)
+                reader.readAsDataURL(file);
             } else if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {

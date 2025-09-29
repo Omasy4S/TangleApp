@@ -230,15 +230,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
-        fun openPdf(pdfUrl: String) {
+        fun openPdf(pdfDataUrl: String) {
             try {
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
                 }
 
-                val uri = if (pdfUrl.startsWith("blob:")) {
-                    // Обработка blob: — сохраняем во временный файл
-                    val inputStream = context.contentResolver.openInputStream(Uri.parse(pdfUrl))
+                val uri: Uri = if (pdfDataUrl.startsWith("data:application/pdf;base64,")) {
+                    // Извлекаем base64 часть из data: URL
+                    val base64Data = pdfDataUrl.substring("data:application/pdf;base64,".length)
+                    // Декодируем base64 в байты
+                    val pdfBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+
+                    // Создаём временный файл
+                    val file = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
+                    // Записываем байты в файл
+                    FileOutputStream(file).use { it.write(pdfBytes) }
+
+                    // Создаём URI через FileProvider
+                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                } else if (pdfDataUrl.startsWith("blob:")) {
+                    val inputStream = context.contentResolver.openInputStream(Uri.parse(pdfDataUrl))
                         ?: throw Exception("Blob stream is null")
                     val file = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
                     FileOutputStream(file).use { outputStream ->
@@ -247,16 +259,18 @@ class MainActivity : AppCompatActivity() {
                     inputStream.close()
                     FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
                 } else {
-                    Uri.parse(pdfUrl)
+                    // Обработка обычного URI (если он есть)
+                    Uri.parse(pdfDataUrl)
                 }
 
                 intent.setDataAndType(uri, "application/pdf")
                 context.startActivity(intent)
             } catch (e: Exception) {
+                e.printStackTrace() // Логируем ошибку для отладки
                 (context as? Activity)?.runOnUiThread {
                     android.widget.Toast.makeText(
                         context,
-                        "Нет приложения для просмотра PDF",
+                        "Нет приложения для просмотра PDF или ошибка открытия",
                         android.widget.Toast.LENGTH_SHORT
                     ).show()
                 }
