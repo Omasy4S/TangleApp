@@ -31,7 +31,6 @@ import java.io.InputStream
 import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var webView: WebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
@@ -110,14 +109,12 @@ class MainActivity : AppCompatActivity() {
             setSupportZoom(false)
             mediaPlaybackRequiresUserGesture = false
         }
-
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 syncDataFromWidget()
             }
         }
-
         webView.webChromeClient = object : WebChromeClient() {
             override fun onShowFileChooser(
                 webView: WebView?,
@@ -126,7 +123,6 @@ class MainActivity : AppCompatActivity() {
             ): Boolean {
                 filePathCallback?.onReceiveValue(null)
                 filePathCallback = callback
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     launchFilePicker()
                 } else {
@@ -161,7 +157,6 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         }
-
         webView.addJavascriptInterface(WebAppInterface(this), "Android")
         webView.loadUrl("file:///android_asset/kiniti.html")
     }
@@ -170,7 +165,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "*/*"
-                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf"))
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf", "text/plain")) // Добавлен text/plain
                 addCategory(Intent.CATEGORY_OPENABLE)
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
@@ -218,7 +213,6 @@ class MainActivity : AppCompatActivity() {
                     .edit()
                     .putString("knittingProjects", projectsJson)
                     .apply()
-
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 val ids = appWidgetManager.getAppWidgetIds(
                     ComponentName(context, KnittingCounterWidget::class.java)
@@ -229,30 +223,39 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // === ОБНОВЛЁННАЯ ФУНКЦИЯ ОТКРЫТИЯ ФАЙЛОВ ===
         @JavascriptInterface
-        fun openPdf(pdfDataUrl: String) {
+        fun openFile(fileDataUrl: String) { // Переименована из openPdf
             try {
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
                 }
-
-                val uri: Uri = if (pdfDataUrl.startsWith("data:application/pdf;base64,")) {
-                    // Извлекаем base64 часть из data: URL
-                    val base64Data = pdfDataUrl.substring("data:application/pdf;base64,".length)
+                val uri: Uri = if (fileDataUrl.startsWith("application/pdf;base64,")) {
+                    // Извлекаем base64 часть из  URL для PDF
+                    val base64Data = fileDataUrl.substring("application/pdf;base64,".length)
                     // Декодируем base64 в байты
                     val pdfBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
-
-                    // Создаём временный файл
+                    // Создаём временный файл .pdf
                     val file = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
                     // Записываем байты в файл
                     FileOutputStream(file).use { it.write(pdfBytes) }
-
                     // Создаём URI через FileProvider
                     FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-                } else if (pdfDataUrl.startsWith("blob:")) {
-                    val inputStream = context.contentResolver.openInputStream(Uri.parse(pdfDataUrl))
+                } else if (fileDataUrl.startsWith("text/plain;base64,")) { // Новая ветвь для текста
+                    // Извлекаем base64 часть из  URL для текста
+                    val base64Data = fileDataUrl.substring("text/plain;base64,".length)
+                    // Декодируем base64 в байты
+                    val textBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                    // Создаём временный файл .txt
+                    val file = File(context.cacheDir, "temp_note_${System.currentTimeMillis()}.txt")
+                    // Записываем байты в файл
+                    FileOutputStream(file).use { it.write(textBytes) }
+                    // Создаём URI через FileProvider
+                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                } else if (fileDataUrl.startsWith("blob:")) {
+                    val inputStream = context.contentResolver.openInputStream(Uri.parse(fileDataUrl))
                         ?: throw Exception("Blob stream is null")
-                    val file = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
+                    val file = File(context.cacheDir, "temp_file_${System.currentTimeMillis()}.tmp") // Временное расширение
                     FileOutputStream(file).use { outputStream ->
                         inputStream.copyTo(outputStream)
                     }
@@ -260,17 +263,22 @@ class MainActivity : AppCompatActivity() {
                     FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
                 } else {
                     // Обработка обычного URI (если он есть)
-                    Uri.parse(pdfDataUrl)
+                    Uri.parse(fileDataUrl)
                 }
-
-                intent.setDataAndType(uri, "application/pdf")
+                // Попытка определить MIME-тип по URI, если не ясно из URL
+                if (intent.type == null) {
+                    val mimeType: String? = context.contentResolver.getType(uri)
+                    intent.setDataAndType(uri, mimeType ?: "*/*")
+                } else {
+                    intent.setDataAndType(uri, intent.type)
+                }
                 context.startActivity(intent)
             } catch (e: Exception) {
                 e.printStackTrace() // Логируем ошибку для отладки
                 (context as? Activity)?.runOnUiThread {
                     android.widget.Toast.makeText(
                         context,
-                        "Нет приложения для просмотра PDF или ошибка открытия",
+                        "Нет приложения для просмотра файла или ошибка открытия",
                         android.widget.Toast.LENGTH_SHORT
                     ).show()
                 }

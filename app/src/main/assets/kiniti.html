@@ -650,6 +650,63 @@
         #imageModal .close-modal:hover {
             background: rgba(0,0,0,0.8);
         }
+        /* === НОВЫЕ СТИЛИ ДЛЯ ТЕКСТОВОГО ПОЛЯ ЗАМЕТКИ === */
+        #noteContentArea {
+            width: 100%;
+            flex: 1; /* Занимает всё доступное вертикальное пространство */
+            min-height: 200px; /* Минимальная высота */
+            padding: 16px; /* Отступы внутри */
+            border: 2px solid var(--primary); /* Более заметная граница */
+            border-radius: 10px; /* Скругление углов */
+            resize: vertical; /* Позволяет пользователю изменять высоту */
+            font-family: inherit; /* Наследует шрифт */
+            font-size: 1.1rem; /* Увеличенный размер шрифта */
+            line-height: 1.5; /* Лучшая читаемость */
+            color: var(--dark); /* Цвет текста */
+            background-color: var(--light); /* Цвет фона */
+            transition: border-color 0.3s, box-shadow 0.3s; /* Плавные переходы */
+            box-sizing: border-box; /* Включает padding в ширину */
+        }
+        /* Стиль для textarea в окне создания заметки */
+        #newNoteContentInput {
+            width: 100%;
+            flex: 1; /* Занимает всё доступное вертикальное пространство */
+            min-height: 150px; /* Минимальная высота */
+            padding: 14px; /* Отступы внутри */
+            border: 2px solid #eee; /* Светлая граница */
+            border-radius: 8px; /* Скругление углов */
+            resize: vertical; /* Позволяет пользователю изменять высоту */
+            font-family: inherit; /* Наследует шрифт */
+            font-size: 1rem; /* Размер шрифта */
+            color: var(--dark); /* Цвет текста */
+            background-color: white; /* Цвет фона */
+            transition: border-color 0.3s; /* Плавный переход */
+            box-sizing: border-box; /* Включает padding в ширину */
+        }
+        #newNoteContentInput:focus {
+            outline: none; /* Убирает стандартный outline */
+            border-color: var(--primary); /* Цвет границы при фокусе */
+        }
+        /* === СТИЛЬ ДЛЯ ИМЕНИ ЗАМЕТКИ В МОДАЛЬНОМ ОКНЕ === */
+        #noteTitleDisplay {
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            font-family: inherit;
+            line-height: 1.3;
+            border: none; /* Убираем рамку */
+            background: transparent; /* Прозрачный фон */
+            color: var(--dark); /* Цвет текста */
+            outline: none; /* Убираем обводку при фокусе */
+        }
+        #noteTitleDisplay:hover {
+            text-decoration: underline; /* Подчеркивание при наведении */
+        }
+        /* #noteTitleDisplay:focus { Убираем стили при фокусе, если не нужен редактор */
+        /*     border-bottom: 2px dashed var(--primary); */
+        /* } */
     </style>
 </head>
 <body>
@@ -676,8 +733,10 @@
         <div class="gallery-grid" id="galleryGrid">
             <!-- Схемы будут рендериться сюда -->
         </div>
-        <input type="file" id="imageInput" accept="image/*,.pdf" style="display: none;" onchange="addImage(this)">
-        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">Загрузить новую схему</button>
+        <!-- Скрытый input для файлов -->
+        <input type="file" id="imageInput" accept="image/*,.pdf,.txt,text/plain" style="display: none;" onchange="addImage(this)">
+        <!-- Кнопка с меню выбора -->
+        <button class="upload-btn" onclick="showUploadMenu()">Добавить схему</button>
     </div>
     <!-- Расчёт — пошаговый -->
     <div id="calculator" class="section">
@@ -752,13 +811,37 @@
         <span class="close-modal" onclick="closeImageModal()" style="position: absolute; top: 20px; right: 20px; font-size: 2rem; color: white; z-index: 10;">×</span>
     </div>
 </div>
+<!-- Модальное окно для создания заметки -->
+<div class="modal" id="createNoteModal">
+    <div class="modal-content" style="max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column;">
+        <span class="close-modal" onclick="closeCreateNoteModal()" style="align-self: flex-end;">&times;</span>
+        <div class="modal-title">
+            <span>Создать новую заметку</span>
+        </div>
+        <input type="text" id="newNoteNameInput" placeholder="Введите имя файла (например, Заметка1.txt)" style="width: 100%; padding: 10px; margin: 12px 0; border: 2px solid #eee; border-radius: 8px; font-size: 1rem;">
+        <textarea id="newNoteContentInput" placeholder="Напишите содержимое заметки..."></textarea>
+        <button class="calc-btn" onclick="saveNewNote()" style="margin-top: 16px;">Создать</button>
+    </div>
+</div>
+<!-- Модальное окно для заметки -->
+<div class="modal" id="noteModal">
+    <!-- Содержимое будет добавлено динамически -->
+</div>
+<!-- Модальное окно для выбора действия -->
+<div class="modal" id="uploadMenuModal">
+    <div class="modal-content" style="max-width: 350px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        <span class="close-modal" onclick="closeUploadMenu()" style="align-self: flex-end;">&times;</span>
+        <h3 style="margin: 0; text-align: center; color: var(--dark);">Что вы хотите добавить?</h3>
+        <button class="calc-btn" onclick="document.getElementById('imageInput').click(); closeUploadMenu();" style="background: #ffbb8a;">📁 Загрузить файл</button>
+        <button class="calc-btn" onclick="createNewNote(); closeUploadMenu();" style="background: #ffbb8a;">📝 Создать заметку</button>
+    </div>
+</div>
 <script>
     // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
     window.projects = JSON.parse(localStorage.getItem('knittingProjects')) || [];
     let schemes = JSON.parse(localStorage.getItem('knittingSchemes')) || [];
     let currentProjectIndex = -1;
     window.isProjectModalOpen = false;
-
     // === НОВАЯ: Безопасное обновление из Android ===
     window.updateProjectsFromAndroid = function(jsonString) {
         try {
@@ -777,14 +860,12 @@
             console.error('Failed to parse projects from Android:', e, jsonString);
         }
     };
-
     // === ИНИЦИАЛИЗАЦИЯ ===
     document.addEventListener('DOMContentLoaded', function() {
         renderProjects();
         renderSchemes();
         showSection('projects');
     });
-
     // === НАВИГАЦИЯ ===
     function showSection(sectionId) {
         document.querySelectorAll('.section').forEach(section => {
@@ -792,7 +873,6 @@
         });
         document.getElementById(sectionId).style.display = 'block';
     }
-
     // === РЕНДЕР ПРОЕКТОВ ===
     function renderProjects() {
         const grid = document.getElementById('projectsGrid');
@@ -806,7 +886,6 @@
         `;
         addProjectWrapper.querySelector('.project-card').onclick = createNewProject;
         grid.appendChild(addProjectWrapper);
-
         projects.forEach((project, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'project-wrapper';
@@ -826,14 +905,12 @@
             grid.appendChild(wrapper);
         });
     }
-
     function createNewProject() {
         const newProject = { name: 'Новый проект', counters: [] };
         projects.push(newProject);
         saveProjects();
         openProject(projects.length - 1);
     }
-
     function openProject(index) {
         currentProjectIndex = index;
         const project = projects[index];
@@ -842,7 +919,6 @@
         document.getElementById('projectModal').style.display = 'flex';
         window.isProjectModalOpen = true;
     }
-
     function closeModal() {
         if (currentProjectIndex !== -1) {
             const newName = document.getElementById('projectTitleInput').value.trim();
@@ -859,7 +935,6 @@
         window.isProjectModalOpen = false;
         renderProjects();
     }
-
     // === РЕНДЕР СЧЁТЧИКОВ ===
     window.renderCounters = function() {
         const list = document.getElementById('countersList');
@@ -902,9 +977,7 @@
             list.appendChild(counterDiv);
         });
     };
-
     // === ОСТАЛЬНЫЕ ФУНКЦИИ (без изменений, кроме escapeHtml) ===
-
     function escapeHtml(text) {
         return text
             .replace(/&/g, "&amp;")
@@ -913,9 +986,7 @@
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-
     // ... остальной JS-код (addCounter, saveProjects, renderSchemes, калькулятор и т.д.) остаётся **без изменений**
-
     // Ниже — весь остальной JS из оригинала (для полноты)
     function addCounter() {
         if (currentProjectIndex === -1) return;
@@ -1017,6 +1088,7 @@
             Android.saveProjects(json);
         }
     }
+    // === ОБНОВЛЁННАЯ ФУНКЦИЯ РЕНДЕРА СХЕМ/ЗАМЕТОК ===
     function renderSchemes() {
         const grid = document.getElementById('galleryGrid');
         grid.innerHTML = '';
@@ -1031,6 +1103,7 @@
             item.style.justifyContent = 'center';
             item.style.textAlign = 'center';
             item.style.padding = '8px';
+
             if (scheme.type === 'pdf') {
                 item.innerHTML = `
                     <div style="font-size: 2.5rem; margin-bottom: 8px;">📄</div>
@@ -1038,13 +1111,20 @@
                     <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
                 `;
                 item.onclick = () => {
-                    if (typeof Android !== 'undefined' && Android.openPdf) {
-                        Android.openPdf(scheme.url);
+                    if (typeof Android !== 'undefined' && Android.openFile) {
+                        Android.openFile(scheme.url); // scheme.url содержит base64 data URL
                     } else {
                         alert('PDF можно открыть только в мобильном приложении.');
                     }
                 };
-            } else {
+            } else if (scheme.type === 'note') {
+                item.innerHTML = `
+                    <div style="font-size: 2.5rem; margin-bottom: 8px;">📝</div>
+                    <div style="font-size: 0.75rem; word-break: break-word;">${escapeHtml(scheme.name)}</div>
+                    <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
+                `;
+                item.onclick = () => openNote(index);
+            } else { // image
                 item.innerHTML = `
                     <img src="${scheme.url}" alt="Схема ${index + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
                     <button class="delete-scheme-btn" onclick="deleteScheme(${index}, event)">×</button>
@@ -1054,18 +1134,18 @@
             grid.appendChild(item);
         });
     }
+
+    // === ОБНОВЛЁННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ ФАЙЛОВ ===
     function addImage(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
             if (file.type === 'application/pdf') {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    // Сохраняем data: URL и имя файла
                     schemes.push({ type: 'pdf', url: e.target.result, name: file.name });
                     saveSchemes();
                     renderSchemes();
                 };
-                // Читаем файл как Data URL (base64)
                 reader.readAsDataURL(file);
             } else if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
@@ -1075,32 +1155,205 @@
                     renderSchemes();
                 };
                 reader.readAsDataURL(file);
+            } else if (file.type === 'text/plain' || file.name.toLowerCase().endsWith('.txt')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    schemes.push({ type: 'note', content: e.target.result, name: file.name });
+                    saveSchemes();
+                    renderSchemes();
+                };
+                reader.readAsText(file);
             } else {
-                alert('Поддерживаются только изображения и PDF-файлы.');
+                alert('Поддерживаются только изображения, PDF и текстовые файлы (.txt).');
             }
         }
+        // Сбросить input, чтобы можно было загрузить один и тот же файл снова
+        input.value = '';
     }
+
+    // === ОБНОВЛЁННАЯ ФУНКЦИЯ УДАЛЕНИЯ СХЕМЫ/ЗАМЕТКИ ===
+    function deleteScheme(index, event) {
+        event.stopPropagation();
+        if (confirm('Удалить этот элемент?')) {
+            const scheme = schemes[index];
+            if (scheme.type === 'pdf') {
+                // URL.revokeObjectURL(scheme.url); // base64 не требует отзыва
+            }
+            // Для 'note' и 'image' не требуется специального отзыва URL
+            schemes.splice(index, 1);
+            saveSchemes();
+            renderSchemes();
+        }
+    }
+
+    // === ОБНОВЛЁННАЯ ФУНКЦИЯ ОТКРЫТИЯ ЗАМЕТКИ ===
+    function openNote(index) {
+        if (index < 0 || index >= schemes.length || schemes[index].type !== 'note') return;
+
+        const note = schemes[index];
+        const modal = document.getElementById('noteModal');
+        modal.style.display = 'flex'; // Показываем сразу
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column;">
+                <span class="close-modal" onclick="closeNoteModal()" style="align-self: flex-end;">&times;</span>
+                <div class="modal-title" style="padding-bottom: 8px; border-bottom: 1px solid var(--primary);">
+                    <span id="noteTitleDisplay" onclick="editNoteName(${index})">${escapeHtml(note.name)}</span>
+                </div>
+                <textarea id="noteContentArea" style="margin-top: 16px;">${escapeHtml(note.content)}</textarea>
+            </div>
+        `;
+
+        // Фокус на textarea при открытии
+        document.getElementById('noteContentArea').focus();
+    }
+
+    // === ОБНОВЛЁННАЯ ФУНКЦИЯ ЗАКРЫТИЯ МОДАЛЬНОГО ОКНА ЗАМЕТКИ ===
+    function closeNoteModal() {
+        // Автоматически сохраняем изменения при закрытии модального окна
+        const modal = document.getElementById('noteModal');
+        if (modal.style.display === 'flex') { // Проверяем, что окно было открыто
+             const textarea = document.getElementById('noteContentArea');
+             const titleDisplay = document.getElementById('noteTitleDisplay');
+             if (textarea && titleDisplay) {
+                 // Находим индекс открытой заметки (простая эвристика: ищем по имени)
+                 const currentNoteName = titleDisplay.textContent;
+                 const index = schemes.findIndex(s => s.type === 'note' && s.name === currentNoteName);
+                 if (index !== -1) {
+                     // Обновляем содержимое и имя (если оно было изменено в другом месте)
+                     schemes[index].content = textarea.value;
+                     // schemes[index].name = titleDisplay.textContent; // Не обновляем имя здесь, т.к. оно может быть изменено в editNoteName
+                     saveSchemes();
+                     renderSchemes(); // Обновляем галерею
+                 }
+             }
+        }
+        modal.style.display = 'none';
+    }
+
+    // === НОВАЯ ФУНКЦИЯ РЕДАКТИРОВАНИЯ ИМЕНИ ЗАМЕТКИ ===
+    function editNoteName(index) {
+        if (index < 0 || index >= schemes.length || schemes[index].type !== 'note') return;
+        const currentName = schemes[index].name;
+        showCustomPromptForText('Введите новое имя файла:', currentName, (newName) => {
+            if (newName && newName.trim()) {
+                schemes[index].name = newName.trim();
+                saveSchemes();
+                renderSchemes(); // Обновляем галерею
+                // Попробуем обновить имя в текущем модальном окне
+                const titleDisplay = document.getElementById('noteTitleDisplay');
+                if (titleDisplay) {
+                     titleDisplay.textContent = escapeHtml(schemes[index].name);
+                }
+            }
+        });
+    }
+
+    // === НОВАЯ ФУНКЦИЯ showCustomPromptForText ===
+    function showCustomPromptForText(title, defaultValue, callback) {
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '9999';
+        modal.style.padding = '16px';
+
+        const dialog = document.createElement('div');
+        dialog.style.backgroundColor = 'white';
+        dialog.style.borderRadius = '12px';
+        dialog.style.padding = '20px';
+        dialog.style.width = '90%';
+        dialog.style.maxWidth = '400px';
+        dialog.style.maxHeight = '80vh';
+        dialog.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+        dialog.style.display = 'flex';
+        dialog.style.flexDirection = 'column';
+        dialog.style.gap = '16px';
+
+        const titleEl = document.createElement('h3');
+        titleEl.textContent = title;
+        titleEl.style.margin = '0 0 12px';
+        titleEl.style.fontWeight = '600';
+        titleEl.style.color = '#5d4a66';
+        dialog.appendChild(titleEl);
+
+        const textarea = document.createElement('textarea');
+        textarea.value = defaultValue;
+        textarea.style.width = '100%';
+        textarea.style.height = '150px'; // Высота для многострочного ввода
+        textarea.style.padding = '10px';
+        textarea.style.border = '2px solid #eee';
+        textarea.style.borderRadius = '8px';
+        textarea.style.fontSize = '1rem';
+        textarea.style.outline = 'none';
+        textarea.style.transition = 'border-color 0.3s';
+        textarea.style.resize = 'vertical'; // Позволяет пользователю изменять высоту
+        textarea.focus();
+        dialog.appendChild(textarea);
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.gap = '12px';
+        buttonContainer.style.justifyContent = 'flex-end';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = 'Отменить';
+        cancelBtn.style.background = '#fcd9b8';
+        cancelBtn.style.color = '#5d4a66';
+        cancelBtn.style.border = 'none';
+        cancelBtn.style.padding = '8px 16px';
+        cancelBtn.style.borderRadius = '8px';
+        cancelBtn.style.cursor = 'pointer';
+        cancelBtn.style.fontWeight = '600';
+        cancelBtn.onclick = () => {
+            document.body.removeChild(modal);
+        };
+        buttonContainer.appendChild(cancelBtn);
+
+        const okBtn = document.createElement('button');
+        okBtn.textContent = 'ОК';
+        okBtn.style.background = '#5d4a66';
+        okBtn.style.color = 'white';
+        okBtn.style.border = 'none';
+        okBtn.style.padding = '8px 16px';
+        okBtn.style.borderRadius = '8px';
+        okBtn.style.cursor = 'pointer';
+        okBtn.style.fontWeight = '600';
+        okBtn.onclick = () => {
+            const value = textarea.value;
+            callback(value);
+            document.body.removeChild(modal);
+        };
+        buttonContainer.appendChild(okBtn);
+
+        dialog.appendChild(buttonContainer);
+        modal.appendChild(dialog);
+        document.body.appendChild(modal);
+
+        modal.onclick = (e) => {
+            if (e.target === modal) { // Закрытие при клике на оверлей
+                document.body.removeChild(modal);
+            }
+        };
+        dialog.onclick = (e) => e.stopPropagation(); // Не закрывать при клике внутри диалога
+    }
+
+    // === НОВАЯ ФУНКЦИЯ СОХРАНЕНИЯ СХЕМ ===
+    function saveSchemes() {
+        localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
+    }
+
     function openImageModal(imageUrl) {
         document.getElementById('modalImage').src = imageUrl;
         document.getElementById('imageModal').style.display = 'flex';
     }
     function closeImageModal() {
         document.getElementById('imageModal').style.display = 'none';
-    }
-    function deleteScheme(index, event) {
-        event.stopPropagation();
-        if (confirm('Удалить эту схему?')) {
-            const scheme = schemes[index];
-            if (scheme.type === 'pdf') {
-                URL.revokeObjectURL(scheme.url);
-            }
-            schemes.splice(index, 1);
-            saveSchemes();
-            renderSchemes();
-        }
-    }
-    function saveSchemes() {
-        localStorage.setItem('knittingSchemes', JSON.stringify(schemes));
     }
     function nextStep() {
         const currentWidth = parseFloat(document.getElementById('currentWidth').value);
@@ -1235,6 +1488,53 @@
         };
         dialog.onclick = (e) => e.stopPropagation();
     }
+
+    // === НОВЫЕ ФУНКЦИИ ДЛЯ СОЗДАНИЯ ЗАМЕТКИ (без изменений) ===
+    function createNewNote() {
+        document.getElementById('newNoteNameInput').value = 'Новая_заметка.txt';
+        document.getElementById('newNoteContentInput').value = '';
+        document.getElementById('createNoteModal').style.display = 'flex';
+    }
+
+    function closeCreateNoteModal() {
+        document.getElementById('createNoteModal').style.display = 'none';
+    }
+
+    function saveNewNote() {
+        const name = document.getElementById('newNoteNameInput').value.trim();
+        const content = document.getElementById('newNoteContentInput').value;
+        if (!name) {
+            alert('Пожалуйста, введите имя файла.');
+            return;
+        }
+        if (!name.toLowerCase().endsWith('.txt')) {
+            alert('Имя файла должно заканчиваться на .txt');
+            return;
+        }
+        // Проверка на дубликат
+        const existingIndex = schemes.findIndex(s => s.type === 'note' && s.name === name);
+        if (existingIndex !== -1) {
+            if (!confirm('Файл с таким именем уже существует. Перезаписать?')) {
+                return;
+            }
+            schemes[existingIndex].content = content;
+        } else {
+            schemes.push({ type: 'note', name: name, content: content });
+        }
+        saveSchemes();
+        renderSchemes();
+        closeCreateNoteModal();
+    }
+
+    // === НОВЫЕ ФУНКЦИИ ДЛЯ ОБЪЕДИНЁННОЙ КНОПКИ ===
+    function showUploadMenu() {
+        document.getElementById('uploadMenuModal').style.display = 'flex';
+    }
+
+    function closeUploadMenu() {
+        document.getElementById('uploadMenuModal').style.display = 'none';
+    }
+
 </script>
 </body>
 </html>
