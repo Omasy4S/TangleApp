@@ -11,6 +11,6 @@ object PrefKeys {
 fun Context.getWidgetPrefs(): SharedPreferences =
     getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
 
-fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) {
+fun SharedPreferences.safeEdit(block: SharedPreferences.Editor.() -> Unit) {
     edit().apply(block).apply()
 }

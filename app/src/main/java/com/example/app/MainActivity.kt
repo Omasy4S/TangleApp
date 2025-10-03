@@ -25,43 +25,29 @@ import androidx.core.content.FileProvider
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.webkit.JavascriptInterface
+import org.json.JSONArray
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStream
-import org.json.JSONArray
 
 class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
 
-    // === Современный лаунчер для выбора файлов ===
-    private val filePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        filePathCallback?.onReceiveValue(
-            WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data)
-        )
+    // Use ActivityResultContracts
+    private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        filePathCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
         filePathCallback = null
     }
 
-    // === Лаунчер для разрешений (только для < Android 13) ===
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            launchFilePicker()
-        } else {
-            filePathCallback?.onReceiveValue(null)
-            filePathCallback = null
-        }
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) launchFilePicker() else filePathCallback?.onReceiveValue(null)
+        filePathCallback = null
     }
 
     private val widgetUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == KnittingCounterWidget.ACTION_WIDGET_UPDATE) {
-                intent.getStringExtra("knittingProjects")?.let { json ->
-                    updateWebViewData(json)
-                }
+                intent.getStringExtra("knittingProjects")?.let { updateWebViewData(it) }
             }
         }
     }
@@ -83,12 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        ContextCompat.registerReceiver(
-            this,
-            widgetUpdateReceiver,
-            filter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        ContextCompat.registerReceiver(this, widgetUpdateReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
         syncDataFromWidget()
     }
 
@@ -104,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             domStorageEnabled = true
             useWideViewPort = true
             loadWithOverviewMode = true
-            allowFileAccess = false // ✅ Отключено для безопасности
+            allowFileAccess = false
             allowContentAccess = true
             setSupportZoom(false)
             mediaPlaybackRequiresUserGesture = false
@@ -116,11 +97,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         webView.webChromeClient = object : WebChromeClient() {
-            override fun onShowFileChooser(
-                webView: WebView?,
-                callback: ValueCallback<Array<Uri>>?,
-                fileChooserParams: FileChooserParams?
-            ): Boolean {
+            override fun onShowFileChooser(webView: WebView?, callback: ValueCallback<Array<Uri>>?, fileChooserParams: FileChooserParams?): Boolean {
                 filePathCallback?.onReceiveValue(null)
                 filePathCallback = callback
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -165,7 +142,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                 type = "*/*"
-                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf", "text/plain")) // Добавлен text/plain
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf", "text/plain"))
                 addCategory(Intent.CATEGORY_OPENABLE)
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
@@ -176,18 +153,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // === Безопасная передача JSON в WebView ===
     private fun injectJsonIntoWebView(jsonString: String) {
         try {
-            // Проверяем валидность JSON
-            JSONArray(jsonString) // или JSONObject, если это объект
+            JSONArray(jsonString)
             val escapedJson = jsonString.replace("\\", "\\\\").replace("\"", "\\\"")
-            webView.evaluateJavascript(
-                "window.updateProjectsFromAndroid(\"$escapedJson\");",
-                null
-            )
+            webView.evaluateJavascript("window.updateProjectsFromAndroid(\"$escapedJson\");", null)
         } catch (e: Exception) {
-            // Невалидный JSON — можно логировать
             webView.evaluateJavascript("console.error('Invalid JSON from Android');", null)
         }
     }
@@ -203,86 +174,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     inner class WebAppInterface(private val context: Context) {
-
         @JavascriptInterface
         fun saveProjects(projectsJson: String) {
             try {
-                // Валидация JSON на стороне Android
                 JSONArray(projectsJson)
                 context.getSharedPreferences("KnittingWidgetPrefs", Context.MODE_PRIVATE)
-                    .edit()
-                    .putString("knittingProjects", projectsJson)
-                    .apply()
+                    .edit().putString("knittingProjects", projectsJson).apply()
                 val appWidgetManager = AppWidgetManager.getInstance(context)
-                val ids = appWidgetManager.getAppWidgetIds(
-                    ComponentName(context, KnittingCounterWidget::class.java)
-                )
+                val ids = appWidgetManager.getAppWidgetIds(ComponentName(context, KnittingCounterWidget::class.java))
                 KnittingCounterWidget.updateAppWidget(context, appWidgetManager, *ids)
-            } catch (e: Exception) {
-                // Логирование ошибки
-            }
+            } catch (e: Exception) { }
         }
 
-        // === ОБНОВЛЁННАЯ ФУНКЦИЯ ОТКРЫТИЯ ФАЙЛОВ ===
         @JavascriptInterface
-        fun openFile(fileDataUrl: String) { // Переименована из openPdf
+        fun openFile(fileDataUrl: String) {
             try {
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
                 }
-                val uri: Uri = if (fileDataUrl.startsWith("application/pdf;base64,")) {
-                    // Извлекаем base64 часть из  URL для PDF
-                    val base64Data = fileDataUrl.substring("application/pdf;base64,".length)
-                    // Декодируем base64 в байты
-                    val pdfBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
-                    // Создаём временный файл .pdf
-                    val file = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
-                    // Записываем байты в файл
-                    FileOutputStream(file).use { it.write(pdfBytes) }
-                    // Создаём URI через FileProvider
-                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-                } else if (fileDataUrl.startsWith("text/plain;base64,")) { // Новая ветвь для текста
-                    // Извлекаем base64 часть из  URL для текста
-                    val base64Data = fileDataUrl.substring("text/plain;base64,".length)
-                    // Декодируем base64 в байты
-                    val textBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
-                    // Создаём временный файл .txt
-                    val file = File(context.cacheDir, "temp_note_${System.currentTimeMillis()}.txt")
-                    // Записываем байты в файл
-                    FileOutputStream(file).use { it.write(textBytes) }
-                    // Создаём URI через FileProvider
-                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-                } else if (fileDataUrl.startsWith("blob:")) {
-                    val inputStream = context.contentResolver.openInputStream(Uri.parse(fileDataUrl))
-                        ?: throw Exception("Blob stream is null")
-                    val file = File(context.cacheDir, "temp_file_${System.currentTimeMillis()}.tmp") // Временное расширение
-                    FileOutputStream(file).use { outputStream ->
-                        inputStream.copyTo(outputStream)
+                val uri: Uri = when {
+                    fileDataUrl.startsWith("data:application/pdf;base64,") -> {
+                        val base64Data = fileDataUrl.substring("data:application/pdf;base64,".length)
+                        val pdfBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                        val file = File(context.cacheDir, "temp_pdf_${System.currentTimeMillis()}.pdf")
+                        FileOutputStream(file).use { it.write(pdfBytes) }
+                        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
                     }
-                    inputStream.close()
-                    FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-                } else {
-                    // Обработка обычного URI (если он есть)
-                    Uri.parse(fileDataUrl)
+                    fileDataUrl.startsWith("data:text/plain;base64,") -> {
+                        val base64Data = fileDataUrl.substring("data:text/plain;base64,".length)
+                        val textBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
+                        val file = File(context.cacheDir, "temp_note_${System.currentTimeMillis()}.txt")
+                        FileOutputStream(file).use { it.write(textBytes) }
+                        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                    }
+                    else -> Uri.parse(fileDataUrl)
                 }
-                // Попытка определить MIME-тип по URI, если не ясно из URL
-                if (intent.type == null) {
-                    val mimeType: String? = context.contentResolver.getType(uri)
-                    intent.setDataAndType(uri, mimeType ?: "*/*")
-                } else {
-                    intent.setDataAndType(uri, intent.type)
-                }
+                intent.setDataAndType(uri, if (fileDataUrl.contains("pdf")) "application/pdf" else "*/*")
                 context.startActivity(intent)
             } catch (e: Exception) {
-                e.printStackTrace() // Логируем ошибку для отладки
+                e.printStackTrace()
                 (context as? Activity)?.runOnUiThread {
-                    android.widget.Toast.makeText(
-                        context,
-                        "Нет приложения для просмотра файла или ошибка открытия",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
+                    android.widget.Toast.makeText(context, "Нет приложения для файла или ошибка открытия", android.widget.Toast.LENGTH_SHORT).show()
                 }
             }
         }
+
     }
 }
