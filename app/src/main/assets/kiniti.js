@@ -736,12 +736,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-function showColorModal() {
-  document.getElementById('colorModal').style.display = 'flex';
-}
-function closeColorModal() {
-  document.getElementById('colorModal').style.display = 'none';
-}
 
 
 
