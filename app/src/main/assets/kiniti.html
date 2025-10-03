@@ -78,29 +78,41 @@
         <h2>Настройки оформления</h2>
         <div id="customizePanel">
             <form id="paletteForm">
-                <label>
-                    Цвет кнопок и выделения<br>
-                    <input type="color" id="colorPrimary">
-                </label>
-                <label>
-                    Цвет секций и карточек<br>
-                    <input type="color" id="colorSecondary">
-                </label>
-                <label>
-                    Цвет удаления и важных акцентов<br>
-                    <input type="color" id="colorAccent">
-                </label>
-                <label>
-                    Цвет текста<br>
-                    <input type="color" id="colorDark">
-                </label>
-                <label>
-                    Фон приложения<br>
-                    <input type="color" id="colorLight">
-                </label>
+                <div style="margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span class="preview-color"
+                          onclick="openColorModal('--primary', getComputedStyle(document.documentElement).getPropertyValue('--primary').trim())"
+                          style="display:inline-block;width:38px;height:38px;background:var(--primary);border-radius:8px;cursor:pointer;"></span>
+                        <span>Цвет кнопок и выделения</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span class="preview-color"
+                          onclick="openColorModal('--secondary', getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim())"
+                          style="display:inline-block;width:38px;height:38px;background:var(--secondary);border-radius:8px;cursor:pointer;"></span>
+                        <span>Цвет секций и карточек</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span class="preview-color"
+                          onclick="openColorModal('--accent', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim())"
+                          style="display:inline-block;width:38px;height:38px;background:var(--accent);border-radius:8px;cursor:pointer;"></span>
+                        <span>Цвет удаления и важных акцентов</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span class="preview-color"
+                          onclick="openColorModal('--dark', getComputedStyle(document.documentElement).getPropertyValue('--dark').trim())"
+                          style="display:inline-block;width:38px;height:38px;background:var(--dark);border-radius:8px;cursor:pointer;"></span>
+                        <span>Цвет текста</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span class="preview-color"
+                          onclick="openColorModal('--light', getComputedStyle(document.documentElement).getPropertyValue('--light').trim())"
+                          style="display:inline-block;width:38px;height:38px;background:var(--light);border-radius:8px;cursor:pointer;border:1.5px solid #fff;box-shadow:0 0 0 1px #eee;"></span>
+                        <span>Фон приложения</span>
+                    </div>
+                </div>
                 <div style="margin-top:18px;display:flex;gap:10px;align-items:center;">
-                    <button class="action-btn main-btn" onclick="saveCustomPalette()">Сохранить</button>
-                    <button class="action-btn main-btn" onclick="resetPalette()">Сбросить</button>
+                    <button type="button" class="action-btn main-btn" onclick="saveCustomPalette()">Сохранить</button>
+                    <button type="button" class="action-btn main-btn" onclick="resetPalette()">Сбросить</button>
                 </div>
             </form>
             <div id="iconCustomization" style="margin-top:24px;">
@@ -113,11 +125,10 @@
                     <button type="button" class="icon-choice" data-icon="⭐️">⭐️</button>
                 </div>
             </div>
-
         </div>
     </div>
-
 </div>
+
 <!-- Модальное окно проекта -->
 <div class="modal" id="projectModal">
     <div class="modal-content">
