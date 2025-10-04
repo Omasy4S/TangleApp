@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Приложение для вязания</title>
     <link rel="stylesheet" href="kiniti.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -77,52 +79,46 @@
     <div id="settings" class="section">
         <h2>Настройки оформления</h2>
         <div id="customizePanel">
-            <form id="paletteForm">
-                <div style="margin-bottom:16px;">
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span class="preview-color"
-                          onclick="openColorModal('--primary', getComputedStyle(document.documentElement).getPropertyValue('--primary').trim())"
-                          style="display:inline-block;width:38px;height:38px;background:var(--primary);border-radius:8px;cursor:pointer;"></span>
-                        <span>Цвет кнопок и выделения</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span class="preview-color"
-                          onclick="openColorModal('--secondary', getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim())"
-                          style="display:inline-block;width:38px;height:38px;background:var(--secondary);border-radius:8px;cursor:pointer;"></span>
-                        <span>Цвет секций и карточек</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span class="preview-color"
-                          onclick="openColorModal('--accent', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim())"
-                          style="display:inline-block;width:38px;height:38px;background:var(--accent);border-radius:8px;cursor:pointer;"></span>
-                        <span>Цвет удаления и важных акцентов</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span class="preview-color"
-                          onclick="openColorModal('--dark', getComputedStyle(document.documentElement).getPropertyValue('--dark').trim())"
-                          style="display:inline-block;width:38px;height:38px;background:var(--dark);border-radius:8px;cursor:pointer;"></span>
-                        <span>Цвет текста</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-                    <span class="preview-color"
-                          onclick="openColorModal('--light', getComputedStyle(document.documentElement).getPropertyValue('--light').trim())"
-                          style="display:inline-block;width:38px;height:38px;background:var(--light);border-radius:8px;cursor:pointer;border:1.5px solid #fff;box-shadow:0 0 0 1px #eee;"></span>
-                        <span>Фон приложения</span>
-                    </div>
+            <div style="margin-bottom:16px; display:flex; gap:8px;">
+                <button type="button" class="action-btn" data-palette="light">Светлая тема</button>
+                <button type="button" class="action-btn" data-palette="dark">Тёмная тема</button>
+            </div>
+            <div id="paletteForm" style="display:flex; gap:16px; flex-wrap:wrap;">
+                <!-- Для каждой переменной CSS рисуем кружок-превью -->
+                <div class="color-picker-group">
+                    <label>Основной цвет</label>
+                    <div class="color-swatch" data-var="--primary"></div>
+                    <input type="color" class="hidden-color-input" data-var="--primary">
                 </div>
-                <div style="margin-top:18px;display:flex;gap:10px;align-items:center;">
-                    <button type="button" class="action-btn main-btn" onclick="saveCustomPalette()">Сохранить</button>
-                    <button type="button" class="action-btn main-btn" onclick="resetPalette()">Сбросить</button>
+                <div class="color-picker-group">
+                    <label>Вторичный цвет</label>
+                    <div class="color-swatch" data-var="--secondary"></div>
+                    <input type="color" class="hidden-color-input" data-var="--secondary">
                 </div>
-            </form>
-            <div id="iconCustomization" style="margin-top:24px;">
-                <h3 style="margin-bottom:8px;">Иконка проектов</h3>
-                <div style="display:flex; gap:12px;">
+                <div class="color-picker-group">
+                    <label>Акцент</label>
+                    <div class="color-swatch" data-var="--accent"></div>
+                    <input type="color" class="hidden-color-input" data-var="--accent">
+                </div>
+                <div class="color-picker-group">
+                    <label>Цвет текста</label>
+                    <div class="color-swatch" data-var="--dark"></div>
+                    <input type="color" class="hidden-color-input" data-var="--dark">
+                </div>
+                <div class="color-picker-group">
+                    <label>Цвет фона</label>
+                    <div class="color-swatch" data-var="--light"></div>
+                    <input type="color" class="hidden-color-input" data-var="--light">
+                </div>
+            </div>
+            <div id="iconCustomization" style="margin-top:24px">
+                <h3 style="margin-bottom:8px">Выбор иконки</h3>
+                <div style="display:flex; gap:16px">
                     <button type="button" class="icon-choice" data-icon="🧶">🧶</button>
-                    <button type="button" class="icon-choice" data-icon="🎨">🎨</button>
                     <button type="button" class="icon-choice" data-icon="🌸">🌸</button>
-                    <button type="button" class="icon-choice" data-icon="✨">✨</button>
-                    <button type="button" class="icon-choice" data-icon="⭐️">⭐️</button>
+                    <button type="button" class="icon-choice" data-icon="⭐">⭐</button>
+                    <button type="button" class="icon-choice" data-icon="🦋">🦋</button>
+                    <button type="button" class="icon-choice" data-icon="🍃">🍃</button>
                 </div>
             </div>
         </div>

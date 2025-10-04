@@ -5,7 +5,13 @@
     --dark: #5d4a66;
     --light: #fef7ff;
     --shadow: 0 4px 12px rgba(0,0,0,0.08);
-    --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* плавная смена переменных */
+      transition:
+        --primary 0.5s ease,
+        --secondary 0.5s ease,
+        --accent 0.5s ease,
+        --dark 0.5s ease,
+        --light 0.5s ease;
 }
 * {
     margin: 0;
@@ -23,6 +29,8 @@ body {
                       radial-gradient(circle at 75% 75%, rgba(248, 205, 202, 0.2) 0%, transparent 50%);
     background-attachment: fixed;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      /* плавная смена фона и текста */
+      transition: background-color 0.5s ease, color 0.5s ease;
 }
 .container {
     max-width: 1000px;
@@ -672,3 +680,45 @@ h1 {
 /* Секции и display control */
 .section { display: none; }
 #projects { display: block; }
+
+.icon-choice {
+  transition: box-shadow 0.3s, transform 0.2s;
+}
+.icon-choice.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent);
+  transform: scale(1.1);
+}
+
+.color-picker-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--dark);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.color-swatch:hover {
+  box-shadow: var(--shadow);
+  transform: scale(1.1);
+}
+
+.hidden-color-input {
+  display: none;
+}
+.pickr-container {
+  position: absolute;
+  z-index: 1000;
+}
+.color-picker-group {
+  position: relative; /* чтобы контейнер платил по кружку */
+}
+

@@ -736,6 +736,96 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  // Пресеты
+  const presetPalettes = {
+    light: {
+      '--primary': '#fcd9b8',
+      '--secondary': '#fef5ec',
+      '--accent': '#f8cdda',
+      '--dark': '#5d4a66',
+      '--light': '#fef7ff'
+    },
+    dark: {
+      '--primary': '#5d4a66',
+      '--secondary': '#4a3a54',
+      '--accent': '#e07a5f',
+      '--dark': '#2b1e2f',
+      '--light': '#3a2a3f'
+    }
+  };
+
+  function applyPalette(palette) {
+    Object.entries(palette).forEach(([varName, value]) => {
+      document.documentElement.style.setProperty(varName, value);
+    });
+    localStorage.setItem('customPalette', JSON.stringify(palette));
+    refreshSwatches(palette);
+  }
+
+  function refreshSwatches(palette) {
+    Object.entries(palette).forEach(([varName, value]) => {
+      document.querySelector(`.color-swatch[data-var="${varName}"]`)
+        .style.backgroundColor = value;
+    });
+  }
+
+  // Обработчики пресетов
+  document.querySelectorAll('[data-palette]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyPalette(presetPalettes[btn.dataset.palette]);
+    });
+  });
+
+  // Восстановление сохранённой палитры
+  const savedPalette = JSON.parse(localStorage.getItem('customPalette') || '{}');
+  if (Object.keys(savedPalette).length) {
+    applyPalette(savedPalette);
+  }
+
+  // Инициализация Pickr на каждом .color-swatch (без доп. контейнера)
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    const varName = swatch.dataset.var;
+    const initial = getComputedStyle(document.documentElement)
+      .getPropertyValue(varName).trim();
+    swatch.style.backgroundColor = initial;
+
+    const pickr = Pickr.create({
+      el: swatch,
+      theme: 'classic',
+      default: initial,
+      components: {
+        preview: true,
+        opacity: false,
+        hue: true,
+        interaction: { input: true, save: true, cancel: true }
+      },
+      i18n: {
+        'ui:dialog': 'Выбор цвета',
+        'btn:save': 'Установить',
+        'btn:cancel': 'Отмена',
+        'btn:input': 'Ввести HEX',
+        'lbl:hex': 'HEX'
+      }
+    });
+
+    pickr.on('save', color => {
+      const hex = color.toHEXA().toString();
+      applyPalette({ [varName]: hex });
+      pickr.hide();
+    });
+    pickr.on('cancel', () => pickr.hide());
+
+    swatch.addEventListener('click', () => {
+      pickr.setColor(getComputedStyle(document.documentElement)
+        .getPropertyValue(varName).trim());
+      pickr.show();
+    });
+  });
+});
+
+
+
 
 
 
