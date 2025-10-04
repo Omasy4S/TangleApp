@@ -747,11 +747,11 @@ document.addEventListener('DOMContentLoaded', () => {
       '--light': '#fef7ff'
     },
     dark: {
-      '--primary': '#5d4a66',
-      '--secondary': '#4a3a54',
-      '--accent': '#e07a5f',
-      '--dark': '#2b1e2f',
-      '--light': '#3a2a3f'
+      '--primary': '#1E1B29',
+      '--secondary': '#C95B43',
+      '--accent': '#FFD7BC',
+      '--dark': '#FFFFFF',
+      '--light': '#1E1B29'
     }
   };
 
@@ -823,12 +823,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
-
-
-
-
-
-
-
-
-

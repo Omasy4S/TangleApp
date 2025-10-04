@@ -74,7 +74,7 @@ h1 {
     font-size: 1rem;
 }
 .nav-btn {
-    background: white;
+    background: var(--primary);
     border: 2px solid var(--primary);
     color: var(--dark);
     padding: 10px 16px;
@@ -720,5 +720,16 @@ h1 {
 }
 .color-picker-group {
   position: relative; /* чтобы контейнер платил по кружку */
+}
+/* Стиль для кнопки «Светлая тема» */
+.action-btn[data-palette="light"] {
+  background: var(--primary);      /* Ваш желаемый цвет фона */
+  color: #5d4a66;           /* Цвет текста */
+  border: 2px solid var(--primary);/* Цвет границы */
+}
+.action-btn[data-palette="dark"] {
+  background: var(--primary);       /* Используемый цвет фона */
+  color: #5d4a66;            /* Цвет текста */
+  border: 2px solid var(--primary); /* Цвет границы */
 }
 
