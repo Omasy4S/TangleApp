@@ -660,7 +660,9 @@ const defaultPalette = {
   '--secondary': '#FEF7F9',     // Цвет секций и карточек
   '--accent': '#e07a5f',        // Цвет удаления и акцентов
   '--dark': '#5d4a66',          // Цвет текста
-  '--light': '#fef7ff'          // Фон приложения
+  '--light': '#fef7ff',          // Фон приложения
+  '--counter': '#ffe3b8',
+  '--counter-btn': '#fcd9b8',
 };
 function applyPalette(palette) {
     for (const key in palette) {
@@ -744,14 +746,18 @@ document.addEventListener('DOMContentLoaded', () => {
       '--secondary': '#fef5ec',
       '--accent': '#f8cdda',
       '--dark': '#5d4a66',
-      '--light': '#fef7ff'
+      '--light': '#fef7ff',
+      '--counter': '#fef5ec',
+      '--counter-btn': '#fcd9b8',
     },
     dark: {
       '--primary': '#1E1B29',
       '--secondary': '#1E1B29',
       '--accent': '#9e70b5',
       '--dark': '#9e70b5',
-      '--light': '#1E1B29'
+      '--light': '#1E1B29',
+      '--counter': '#1E1B29',
+      '--counter-btn': '#5432d1',
     }
   };
 
