@@ -748,9 +748,9 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     dark: {
       '--primary': '#1E1B29',
-      '--secondary': '#C95B43',
-      '--accent': '#FFD7BC',
-      '--dark': '#FFFFFF',
+      '--secondary': '#1E1B29',
+      '--accent': '#9e70b5',
+      '--dark': '#9e70b5',
       '--light': '#1E1B29'
     }
   };
