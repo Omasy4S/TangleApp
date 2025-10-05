@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken
 object PrefKeys {
     const val KNITTING_PROJECTS = "knittingProjects"
     const val WIDGET_COUNTER_ID_PREFIX = "widget_counter_id_"
+    const val WIDGET_COLORS = "widgetColors"
 }
 
 /**
@@ -108,4 +109,56 @@ fun getCounterById(
     val counter = project.counters[counterIndex]
     
     return Triple(project, counter, Pair(projectIndex, counterIndex))
+}
+
+/**
+ * Data class для хранения цветов виджета
+ */
+data class WidgetColors(
+    val primary: String = "#fcd9b8",
+    val secondary: String = "#fef5ec",
+    val accent: String = "#f8cdda",
+    val dark: String = "#5d4a66",
+    val light: String = "#fef7ff",
+    val counter: String = "#ffe3b8",
+    val counterBtn: String = "#fcd9b8"
+)
+
+/**
+ * Extension function для загрузки цветов виджета
+ * @return WidgetColors с сохранёнными цветами или цвета по умолчанию
+ */
+fun SharedPreferences.loadWidgetColors(): WidgetColors {
+    val json = getString(PrefKeys.WIDGET_COLORS, null) ?: return WidgetColors()
+    
+    return runCatching {
+        val gson = Gson()
+        val map = gson.fromJson<Map<String, String>>(
+            json,
+            object : TypeToken<Map<String, String>>() {}.type
+        )
+        
+        WidgetColors(
+            primary = map["--primary"] ?: "#fcd9b8",
+            secondary = map["--secondary"] ?: "#fef5ec",
+            accent = map["--accent"] ?: "#f8cdda",
+            dark = map["--dark"] ?: "#5d4a66",
+            light = map["--light"] ?: "#fef7ff",
+            counter = map["--counter"] ?: "#ffe3b8",
+            counterBtn = map["--counter-btn"] ?: "#fcd9b8"
+        )
+    }.getOrElse { WidgetColors() }
+}
+
+/**
+ * Конвертация HEX цвета в Android Color Int
+ * @param hex HEX строка цвета (например "#fcd9b8")
+ * @return Int представление цвета
+ */
+fun String.parseColor(): Int {
+    return try {
+        android.graphics.Color.parseColor(this)
+    } catch (e: Exception) {
+        android.graphics.Color.parseColor("#fcd9b8") // fallback
+    }
 }
