@@ -7,6 +7,8 @@
 [![Kotlin](https://img.shields.io/badge/Language-Kotlin-purple.svg)](https://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+[![📸 Посмотреть скриншоты](https://img.shields.io/badge/📸_Скриншоты-FF6B6B?style=for-the-badge&logo=image&logoColor=white)](https://imgur.com/a/fhxMbO2)
+
 ## ✨ Основные возможности
 
 ### 🎯 Управление проектами
