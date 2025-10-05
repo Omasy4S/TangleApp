@@ -145,8 +145,8 @@ h1 {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: rgba(224, 122, 95, 0.9);
-    color: white;
+    background: var(--counter-btn);
+    color: var(--dark);
     border: 2px solid white;
     width: 28px;
     height: 28px;
@@ -162,7 +162,8 @@ h1 {
     transition: all 0.2s ease;
 }
 .delete-project-card:hover {
-    background: #e07a5f;
+    background: var(--accent);
+    color: white;
     transform: scale(1.1);
 }
 
@@ -323,13 +324,20 @@ h1 {
 }
 .add-counter-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12);}
 .delete-project-btn {
-    background: #e07a5f;
-    color: white;
+    background: var(--counter-btn);
+    color: var(--dark);
     padding: 10px 16px;
     margin-top: 12px;
     width: 100%;
+    border: 2px solid var(--primary);
+    font-weight: 600;
 }
-.delete-project-btn:hover { background: #c95b43; transform: translateY(-2px);}
+.delete-project-btn:hover { 
+    background: var(--accent); 
+    color: white;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
 /* Секция схем и галерея */
 .gallery-grid {
     display: grid;
@@ -368,9 +376,9 @@ h1 {
     position: absolute;
     top: 5px;
     right: 5px;
-    background: rgba(224, 122, 95, 0.8);
-    color: white;
-    border: none;
+    background: var(--counter-btn);
+    color: var(--dark);
+    border: 2px solid white;
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -381,16 +389,17 @@ h1 {
     justify-content: center;
     font-size: 1.2rem;
     z-index: 10;
-    opacity: 0.7;
-    transition: opacity 0.2s, background-color 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
 }
 .delete-scheme-btn:hover {
-    opacity: 1;
-    background: rgba(224, 122, 95, 0.9);
+    background: var(--accent);
+    color: white;
+    transform: scale(1.1);
 }
 .upload-btn {
-    background: #ffbb8a;
-    color: white;
+    background: var(--counter-btn);
+    color: var(--dark);
     padding: 12px;
     border-radius: 10px;
     margin-top: 16px;
@@ -398,11 +407,14 @@ h1 {
     max-width: 300px;
     margin-left: auto;
     margin-right: auto;
+    border: 2px solid var(--primary);
+    font-weight: 600;
 }
 .upload-btn:hover {
     background: var(--primary);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    border-color: var(--accent);
 }
 
 /* Модальное окно изображения */
@@ -453,17 +465,23 @@ h1 {
     flex: 1;
     min-height: 150px;
     padding: 14px;
-    border: 2px solid #eee;
-    border-radius: 8px;
+    border: 3px solid var(--primary);
+    border-radius: 10px;
     resize: vertical;
     font-family: inherit;
     font-size: 1rem;
     color: var(--dark);
     background-color: white;
-    transition: border-color 0.3s;
+    font-weight: 500;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
     box-sizing: border-box;
 }
-#newNoteContentInput:focus { outline: none; border-color: var(--primary);}
+#newNoteContentInput:focus { 
+    outline: none; 
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(248, 205, 218, 0.25), inset 0 2px 4px rgba(0,0,0,0.05);
+}
 #noteTitleDisplay {
     font-size: 1.3rem;
     cursor: pointer;
@@ -491,10 +509,11 @@ h1 {
     margin-top: 16px;
 }
 .calc-group {
-    background: white;
+    background: var(--secondary);
     padding: 16px;
     border-radius: 12px;
     box-shadow: var(--shadow);
+    border: 2px solid var(--primary);
 }
 .calc-title {
     font-weight: 600;
@@ -504,18 +523,27 @@ h1 {
     font-size: 1.2rem;
 }
 .calc-input-group { margin-bottom: 12px; }
-.calc-label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: #666; }
+.calc-label { display: block; margin-bottom: 6px; font-size: 0.9rem; color: var(--dark); font-weight: 600; }
 .calc-input {
     width: 100%;
-    padding: 10px;
-    border: 2px solid #eee;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: var(--transition);
+    padding: 12px;
+    border: 3px solid var(--primary);
+    border-radius: 10px;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: var(--dark);
+    font-weight: 500;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
-.calc-input:focus { outline: none; border-color: var(--primary);}
+.calc-input:focus { 
+    outline: none; 
+    border-color: var(--accent); 
+    box-shadow: 0 0 0 4px rgba(248, 205, 218, 0.25), inset 0 2px 4px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+}
 .calc-result {
-    background: var(--secondary);
+    background: var(--counter);
     padding: 20px;
     border-radius: 16px;
     margin-top: 16px;
@@ -524,7 +552,7 @@ h1 {
     font-size: 1.1rem;
     color: var(--dark);
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 1px solid var(--primary);
+    border: 2px solid var(--primary);
 }
 .calc-result p {
     margin: 0;
@@ -536,18 +564,21 @@ h1 {
 }
 .calc-result i { font-size: 1.5rem; color: var(--accent);}
 .calc-btn {
-    background: #ffbb8a;
-    color: white;
+    background: var(--counter-btn);
+    color: var(--dark);
     padding: 12px;
     border-radius: 10px;
     width: 100%;
     margin-top: 12px;
     box-shadow: var(--shadow);
+    border: 2px solid var(--primary);
+    font-weight: 600;
 }
 .calc-btn:hover {
     background: var(--primary);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    border-color: var(--accent);
 }
 .calc-step { display: none; }
 #step1 { display: block; }
@@ -569,80 +600,24 @@ h1 {
 /* Новые стили для textarea и input при создании заметки */
 #newNoteNameInput {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin: 12px 0;
-    border: 2px solid #eee;
-    border-radius: 8px;
+    border: 3px solid var(--primary);
+    border-radius: 10px;
     font-size: 1rem;
+    background: white;
+    color: var(--dark);
+    font-weight: 500;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
 }
 #newNoteNameInput:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(248, 205, 218, 0.25), inset 0 2px 4px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
 }
 
-#paletteForm label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    font-size: 1rem;
-}
-#paletteForm input[type="color"] {
-    border: none;
-    width: 38px; height: 38px; background: none;
-    padding: 0; cursor: pointer; border-radius: 8px; box-shadow: 0 2px 8px #0001;
-}
-
-.icon-choice {
-    font-size: 2rem;
-    background: #fff;
-    border: 2px solid var(--primary);
-    border-radius: 10px;
-    cursor: pointer;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: box-shadow 0.2s;
-}
-.icon-choice.selected {
-    border: 2px solid var(--accent);
-    box-shadow: 0 0 0 2px var(--accent);
-}
-
-#paletteForm label {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 15px; font-size: 1rem;
-}
-#palettePreview div {
-  box-shadow: 0 2px 8px #0001;
-  border: 2px solid #eee;
-}
-
-.action-btn {
-  border: none;
-  border-radius: 40px;
-  padding: 12px 32px;
-  font-size: 1.1rem;
-  font-weight: 650;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 4px 12px rgba(93, 74, 102, 0.08);
-  margin: 0 8px 16px 0;
-}
-
-.main-btn {
-  background: linear-gradient(90deg, #fcd9b8, #f8cdda);
-  color: #5d4a66;
-  border: 2px solid #fcd9b8;
-}
-
-.main-btn:hover {
-  background: #fcd9b8;
-  color: #e07a5f;
-  transform: translateY(-2px) scale(1.06);
-  border-color: #e07a5f;
-}
 
 
 /* Адаптивные медиа-запросы */
@@ -660,7 +635,7 @@ h1 {
     .modal-title { font-size: 1.3rem;}
     .edit-title { font-size: 1.3rem;}
     .counter-value { font-size: 1.2rem; min-width: 45px;}
-    .counter-header .counter-btn { background: #e07a5f; width: 30px; height: 30px; font-size: 0.9rem;}
+    .counter-header .counter-btn { width: 30px; height: 30px; font-size: 0.9rem;}
     .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px;}
     .gallery-item { font-size: 0.85rem; padding: 6px;}
     #calculator { padding: 0;}
@@ -683,36 +658,6 @@ h1 {
 .section { display: none; }
 #projects { display: block; }
 
-.icon-choice {
-  transition: box-shadow 0.3s, transform 0.2s;
-}
-.icon-choice.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent);
-  transform: scale(1.1);
-}
-
-.color-picker-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.color-swatch {
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--dark);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: box-shadow var(--transition), transform var(--transition);
-}
-
-.color-swatch:hover {
-  box-shadow: var(--shadow);
-  transform: scale(1.1);
-}
-
 .hidden-color-input {
   display: none;
 }
@@ -720,18 +665,294 @@ h1 {
   position: absolute;
   z-index: 1000;
 }
+/* Стили для секции настроек */
+.settings-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.settings-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--primary);
+}
+
+.settings-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.settings-card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0;
+}
+
+.settings-description {
+  color: #8a7c94;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Кнопки тем */
+.theme-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--secondary);
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  color: var(--dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  flex: 1;
+  min-width: 140px;
+}
+
+.theme-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border-color: var(--accent);
+}
+
+.theme-btn:active {
+  transform: translateY(0);
+}
+
+.theme-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.theme-btn:hover .theme-preview {
+  transform: scale(1.1);
+}
+
+.theme-preview-light {
+  background: linear-gradient(135deg, #fcd9b8 0%, #fef5ec 50%, #ffe3b8 100%);
+}
+
+.theme-preview-dark {
+  background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 50%, #3a3a3a 100%);
+}
+
+/* Сетка цветов */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
 .color-picker-group {
-  position: relative; /* чтобы контейнер платил по кружку */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
 }
-/* Стиль для кнопки «Светлая тема» */
-.action-btn[data-palette="light"] {
-  background: var(--primary);      /* Ваш желаемый цвет фона */
-  color: #5d4a66;           /* Цвет текста */
-  border: 2px solid var(--primary);/* Цвет границы */
+
+.color-picker-group label {
+  font-size: 0.85rem;
+  color: var(--dark);
+  font-weight: 500;
+  text-align: center;
 }
-.action-btn[data-palette="dark"] {
-  background: var(--primary);       /* Используемый цвет фона */
-  color: #5d4a66;            /* Цвет текста */
-  border: 2px solid var(--primary); /* Цвет границы */
+
+.color-swatch {
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--dark);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  position: relative;
+  overflow: visible !important;
+}
+
+.color-swatch::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+  pointer-events: none;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+}
+
+.color-swatch:hover::before {
+  border-color: var(--accent);
+}
+
+.color-swatch:active {
+  transform: scale(1.05);
+}
+
+/* Фикс для Pickr */
+.color-swatch .pcr-button {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* Сетка иконок */
+.icon-grid {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.icon-choice {
+  font-size: 2.2rem;
+  background: var(--secondary);
+  border: 3px solid var(--primary);
+  border-radius: 12px;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  position: relative;
+}
+
+.icon-choice:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  border-color: var(--accent);
+}
+
+.icon-choice.selected {
+  border-color: var(--accent);
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgba(248, 205, 218, 0.3);
+  transform: scale(1.1);
+}
+
+.icon-choice.selected::after {
+  content: '✓';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--accent);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Адаптивность для настроек */
+@media (max-width: 768px) {
+  .settings-card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .settings-card-title {
+    font-size: 1.1rem;
+  }
+  
+  .settings-icon {
+    font-size: 1.5rem;
+  }
+  
+  .color-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  
+  .color-swatch {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .icon-choice {
+    width: 55px;
+    height: 55px;
+    font-size: 2rem;
+  }
+  
+  .theme-btn {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    min-width: 120px;
+  }
+  
+  .theme-preview {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-buttons {
+    flex-direction: column;
+  }
+  
+  .theme-btn {
+    min-width: 100%;
+  }
+  
+  .color-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .color-swatch {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .color-picker-group label {
+    font-size: 0.75rem;
+  }
+  
+  .icon-grid {
+    gap: 8px;
+  }
 }
 
