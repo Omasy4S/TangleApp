@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light">
     <title>Приложение для вязания</title>
     <link rel="stylesheet" href="kiniti.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
@@ -72,7 +73,7 @@
             <div class="calc-result" id="calcResult"></div>
             <div style="display:flex;gap:12px;margin-top:16px;">
                 <button class="calc-btn" style="flex:1;" onclick="backToStep2()">Изменить</button>
-                <button class="calc-btn" style="flex:1;background:#f06292;" onclick="resetCalculator()">Заполнить заново</button>
+                <button class="calc-btn reset-btn" style="flex:1;" onclick="resetCalculator()">Заполнить заново</button>
             </div>
         </div>
     </div>
@@ -132,13 +133,18 @@
                     </div>
                     <div class="color-picker-group">
                         <div class="color-swatch" data-var="--counter-btn"></div>
-                        <label>Кнопки и крестики</label>
+                        <label>Кнопки</label>
                         <input type="color" class="hidden-color-input" data-var="--counter-btn">
                     </div>
                     <div class="color-picker-group">
                         <div class="color-swatch" data-var="--accent"></div>
                         <label>Акцент</label>
                         <input type="color" class="hidden-color-input" data-var="--accent">
+                    </div>
+                        <div class="color-picker-group">
+                        <div class="color-swatch" data-var="--delete-btn"></div>
+                        <label>Крестики</label>
+                        <input type="color" class="hidden-color-input" data-var="--delete-btn">
                     </div>
                 </div>
             </div>

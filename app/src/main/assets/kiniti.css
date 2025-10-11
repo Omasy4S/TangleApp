@@ -6,7 +6,8 @@
     --light: #fef7ff;
     --shadow: 0 4px 12px rgba(0,0,0,0.08);
     --counter: #ffe3b8;
-    --counter-btn: #fcd9b8;
+    --counter-btn: #FFBB7B; /* Все кнопки */
+    --delete-btn: #e88b7a; /* Все крестики */
     /* плавная смена переменных */
       transition:
         --primary 0.5s ease,
@@ -145,8 +146,8 @@ h1 {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: var(--counter-btn);
-    color: var(--dark);
+    background: var(--delete-btn); /* Крестик удаления проекта */
+    color: white; /* Белый текст */
     border: none;
     width: 28px;
     height: 28px;
@@ -268,7 +269,7 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255,255,255,0.3);
+    background: var(--light); /* Цвет фона из настроек */
     padding: 8px 12px;
     border-radius: 8px;
 }
@@ -310,6 +311,22 @@ h1 {
     justify-content: center;
 }
 .counter-btn:hover { transform: scale(1.08);}
+.delete-counter-btn {
+    background: var(--delete-btn); /* Крестик удаления счетчика */
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.delete-counter-btn:hover { transform: scale(1.08);}
 .add-counter-btn {
     background: rgba(255,255,255,0.8);
     color: var(--dark);
@@ -324,8 +341,8 @@ h1 {
 }
 .add-counter-btn:hover { background: rgba(255,255,255,0.9); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12);}
 .delete-project-btn {
-    background: var(--counter-btn);
-    color: var(--dark);
+    background: var(--delete-btn); /* Привязана к цвету крестиков */
+    color: white; /* Белый текст для контраста */
     padding: 10px 16px;
     margin-top: 12px;
     width: 100%;
@@ -376,8 +393,8 @@ h1 {
     position: absolute;
     top: 5px;
     right: 5px;
-    background: var(--counter-btn);
-    color: var(--dark);
+    background: var(--delete-btn); /* Крестик удаления схемы */
+    color: white; /* Белый текст */
     border: none; /* Убрана белая обводка */
     width: 28px;
     height: 28px;
@@ -580,6 +597,11 @@ h1 {
     box-shadow: 0 6px 16px rgba(0,0,0,0.12);
     border-color: var(--accent);
 }
+
+/* Кнопка "Заполнить заново" использует цвет крестиков */
+.reset-btn {
+    background: var(--delete-btn) !important;
+}
 .calc-step { display: none; }
 #step1 { display: block; }
 @keyframes fadeIn {
@@ -635,7 +657,8 @@ h1 {
     .modal-title { font-size: 1.3rem;}
     .edit-title { font-size: 1.3rem;}
     .counter-value { font-size: 1.2rem; min-width: 45px;}
-    .counter-header .counter-btn { width: 30px; height: 30px; font-size: 0.9rem;}
+    .counter-header .counter-btn,
+    .counter-header .delete-counter-btn { width: 30px; height: 30px; font-size: 0.9rem;}
     .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px;}
     .gallery-item { font-size: 0.85rem; padding: 6px;}
     #calculator { padding: 0;}

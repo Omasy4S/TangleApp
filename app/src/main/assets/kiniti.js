@@ -33,16 +33,18 @@ const COLOR_PRESETS = {
         '--dark': '#5d4a66',
         '--light': '#fef7ff',
         '--counter': '#fef5ec',
-        '--counter-btn': '#fcd9b8',
+        '--counter-btn': '#FFBB7B', // Все кнопки в приложении
+        '--delete-btn': '#e88b7a', // Все крестики удаления
     },
     dark: {
-        '--primary': '#5432d1', // Яркий акцент для обводок
+        '--primary': '#171030', // Основной
         '--secondary': '#1E1B29', // Темный фон карточек
         '--accent': '#9e70b5', // Фиолетовый акцент
         '--dark': '#9e70b5', // Цвет текста (светло-фиолетовый)
         '--light': '#2a2636', // Светлее чем secondary для кнопок
-        '--counter': '#2a2636', // Фон счетчиков
-        '--counter-btn': '#3d2f5a', // Темнее для кнопок в модалках
+        '--counter': '#312A44', // Счетчики
+        '--counter-btn': '#3d2f5a', // Все кнопки в приложении
+        '--delete-btn': '#743B69', // Крестики
     }
 };
 
@@ -229,7 +231,7 @@ window.renderCounters = function() {
                 <input type="text" class="counter-name" 
                        value="${escapeHtml(counter.name)}" 
                        onblur="updateCounterName(${idx}, this.value)">
-                <button class="counter-btn" onclick="removeCounter(${idx})">×</button>
+                <button class="delete-counter-btn" onclick="removeCounter(${idx})">×</button>
             </div>
             <div class="counter-controls">
                 <div class="control-group">
@@ -859,6 +861,11 @@ function initializeThemeButtons() {
 function loadSavedPalette() {
     const savedPalette = JSON.parse(localStorage.getItem('customPalette') || '{}');
     if (Object.keys(savedPalette).length) {
+        // Обновляем --counter-btn если он старый (миграция)
+        if (savedPalette['--counter-btn'] === '#d97564') {
+            savedPalette['--counter-btn'] = '#e88b7a';
+            localStorage.setItem('customPalette', JSON.stringify(savedPalette));
+        }
         applyPalette(savedPalette);
     }
 }

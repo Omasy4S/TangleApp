@@ -27,6 +27,17 @@ android {
             )
         }
     }
+    
+    // Настройка имени APK файла
+    applicationVariants.all {
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val versionName = defaultConfig.versionName
+            val buildType = buildType.name
+            // Формат: TangleApp-v1.0-release.apk
+            output.outputFileName = "TangleApp-v${versionName}-${buildType}.apk"
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
