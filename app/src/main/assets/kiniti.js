@@ -33,7 +33,7 @@ const COLOR_PRESETS = {
         '--dark': '#5d4a66',
         '--light': '#fef7ff',
         '--counter': '#fef5ec',
-        '--counter-btn': '#FFBB7B', // Все кнопки в приложении
+        '--counter-btn': '#FFD7B2', // Все кнопки в приложении
         '--delete-btn': '#e88b7a', // Все крестики удаления
     },
     dark: {

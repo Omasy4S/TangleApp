@@ -6,7 +6,7 @@
     --light: #fef7ff;
     --shadow: 0 4px 12px rgba(0,0,0,0.08);
     --counter: #ffe3b8;
-    --counter-btn: #FFBB7B; /* Все кнопки */
+    --counter-btn: #FFD7B2; /* Все кнопки */
     --delete-btn: #e88b7a; /* Все крестики */
     /* плавная смена переменных */
       transition:
