@@ -90,6 +90,11 @@ class MainActivity : AppCompatActivity() {
             setSupportZoom(false)
             mediaPlaybackRequiresUserGesture = false
         }
+        
+        // Отключаем принудительную темную тему WebView (Android 10+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            webView.settings.forceDark = android.webkit.WebSettings.FORCE_DARK_OFF
+        }
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
@@ -174,6 +179,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     inner class WebAppInterface(private val context: Context) {
+        @SuppressLint("UseKtx")
         @JavascriptInterface
         fun saveProjects(projectsJson: String) {
             try {
@@ -186,6 +192,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) { }
         }
 
+        @SuppressLint("UseKtx")
         @JavascriptInterface
         fun openFile(fileDataUrl: String) {
             try {
